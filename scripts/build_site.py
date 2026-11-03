@@ -133,7 +133,7 @@ def catalog(prefix=''):
     p = prefix
     first = by_code.get('01') or lessons[0]
     start_cards = ''.join(course_card(by_code[c], p) for c in ['01', '00'] if c in by_code)
-    start = f'''<section class="course-group start-group" id="start"><div class="section-heading"><div><span class="eyebrow">第一步</span><h2>先学入门课</h2></div><p>设好工作空间，装好技能，学会打开文件核对结果。</p></div>
+    start = f'''<section class="course-group start-group" id="start"><div class="section-heading"><div><span class="eyebrow">第一步</span><h2>先学入门课</h2></div><p>选好工作文件夹，装好技能，学会打开文件看结果。</p></div>
 <ol class="start-cards">{start_cards}</ol></section>'''
     tracks = ''
     for key, t in TRACKS.items():
@@ -141,29 +141,29 @@ def catalog(prefix=''):
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
         tracks += f'''<section class="course-group track" id="{key}"><div class="track-head"><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
-<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每一课先讲清技能是怎么工作的，再带你拿到能打开、能核对的结果。</p><p class="hero-what">WorkBuddy 是腾讯推出的桌面 AI 助手：你用中文说清要做什么，它会读取你电脑上指定文件夹里的资料，调用技能分析数据、拆视频、写脚本、出片，并把结果保存成文件。不需要会编程。</p>
+<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你做出结果，自己打开核对。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
 <div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a><a class="secondary" href="#prepare">开始前准备</a></div>
 <p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课程 · 原理流程图 · 讲解录屏 · 可复制提示词</p></div>
 <aside class="prepare" id="prepare"><h2>开始前准备</h2><ol>
-<li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。使用会消耗积分，具体规则以应用内说明为准。</p></div></li>
-<li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图、一两条你想学的对标爆款视频。还没起号的，想好一句话：做什么内容、给谁看。</p></div></li>
-<li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它作为工作空间，结果都会存在里面。</p></div></li>
-<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 会带你装好技能、配好 Key。之后每课：看原理图 → 看录屏 → 把提示词换成你自己的账号 → 核对结果。</p></div></li>
+<li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。用起来会扣积分，规则看应用内说明。</p></div></li>
+<li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图，再挑一两条想学的对标爆款视频。还没起号的，想好一句话：做什么内容，给谁看。</p></div></li>
+<li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它当工作空间，之后的结果都存在这里。</p></div></li>
+<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你装技能、配 Key。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号，再核对结果。</p></div></li>
 </ol></aside></section>
 {start}
-<div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块按顺序衔接：前一课的结果是后一课的输入。也可以只学你需要的那一课，提示词里换成你手上已有的材料即可。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
-<p id="search-empty" hidden>没有匹配的课程，请试试“对标”“复刻”或课程编号。</p>
+<div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块是连着的，前一课的结果就是后一课的材料。只想学某一课也行，把提示词里的材料换成你手上有的。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
+<p id="search-empty" hidden>没找到，试试“对标”“复刻”或课号。</p>
 <div class="tracks">{tracks}</div>
 <section class="faq" id="faq"><h2>卡住了怎么办</h2>
-<details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方是否显示你的工作文件夹。没有的话，说明没选工作空间，新建任务重新选择。再打开电脑上的“成果”文件夹确认文件是否真的存在，不要只看回复里说“已保存”。</p></details>
-<details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的账号，而且 AI 每次生成的内容都会不同。用每课“怎么核对结果”里的要点检查，不用和录屏逐字对照。</p></details>
-<details><summary>没有显卡，也不想花钱租 GPU</summary><p>走代码视频路线：4-2、5-2 用 Hypit 和 HyperFrames 做代码类视频，不需要显卡。5-1 的 AI 镜头生成也可以直接调 API，按次付费。</p></details>
-<details><summary>技能读不到平台数据怎么办</summary><p>技能会先用 WorkBuddy 自带的浏览器能力看平台页面；读不出来时会问你：换 TikHub 接口（付费），或者你手动给链接和截图。批量采集工具如 MediaCrawler 容易被封号，课程不演示；确实要用，控制频率和数据量，只采公开数据做个人研究。</p></details>
-<details><summary>能不能拿别人的视频直接复刻发布？</summary><p>不能。拆解只用于学习做法；复刻要换成自己的故事、角色和文案，去掉原作者的水印和标识，并在发布前做 6-1 的审核。不要用真人明星的脸或声音。</p></details>
-<details><summary>想跳过某一课，或者前一课没做完</summary><p>可以。后一课的提示词里，把“上一课的结果”换成你手上已有的材料：比如没做 1-1，就直接告诉它你的 3 个对标账号。</p></details>
+<details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方有没有显示你的工作文件夹。没有就是没选工作空间，新建任务重选。然后去电脑上打开“成果”文件夹，看文件在不在。回复里说“已保存”不算数。</p></details>
+<details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的号，AI 每次生成的内容也不一样。按每课“怎么核对结果”里的几条查就行，不用和录屏逐字比。</p></details>
+<details><summary>没有显卡，也不想花钱租 GPU</summary><p>走代码视频：4-2、5-2 用 Hypit 和 HyperFrames 写代码出片，不用显卡。5-1 的 AI 镜头也能直接调 API，按次付费。</p></details>
+<details><summary>技能读不到平台数据怎么办</summary><p>技能先用 WorkBuddy 自带的浏览器去看平台页面。读不出来，它会问你是换 TikHub 接口（付费），还是你自己给链接和截图。MediaCrawler 这类批量采集工具容易被封号，课程不演示；非要用的话，控制频率和数据量，只采公开数据，自己研究用。</p></details>
+<details><summary>能不能拿别人的视频直接复刻发布？</summary><p>不能。拆解是为了学做法。复刻要换成自己的故事、角色和文案，去掉原作者的水印和标识，发布前过一遍 6-1 的审核。别用真人明星的脸和声音。</p></details>
+<details><summary>想跳过某一课，或者前一课没做完</summary><p>可以。把后一课提示词里的“上一课的结果”换成你手上有的材料。比如没做 1-1，就直接告诉它你的 3 个对标账号。</p></details>
 </section>
-<aside class="scope-note"><strong>关于录屏演示</strong><p>录屏里的“阿夏的AI片场”是演示账号，后台数据为虚构；两条爆款样片为课程自制，人物均为 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。学习进度只保存在你当前使用的浏览器里。</p></aside></main>
-<footer class="site-footer"><span>{SITE_NAME} · 按步骤学习，依据结果核对。</span><a href="{GITHUB_URL}">查看 Markdown 与课程文件</a></footer>'''
+<aside class="scope-note"><strong>关于录屏演示</strong><p>录屏里的“阿夏的AI片场”是演示账号，后台数据是编的；两条爆款样片是课程自己做的，人物都是 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。学习进度只存在你现在用的这个浏览器里。</p></aside></main>
+<footer class="site-footer"><span>{SITE_NAME} · 跟着做，对着结果查。</span><a href="{GITHUB_URL}">查看 Markdown 与课程文件</a></footer>'''
     return shell('课程目录', body, prefix, 'home-page')
 
 

@@ -4,10 +4,10 @@
 
 **[进入课程网站](https://juneyaooo.github.io/media-teach/)**
 
-- 每课先用流程图讲清技能怎么工作，再给只写需求的提示词，最后教你核对结果
+- 每课先用一张流程图讲技能怎么干活，再给提示词（只写需求），最后教你核对结果
 - 录屏用演示账号「阿夏的AI片场」完整演示（后台数据虚构，样片自制；找对标是平台实搜）
 - 共 15 节：00 总纲、01 入门、六个模块各 2 节、07 结课
-- 工具：[JuneYaooo](https://github.com/JuneYaooo) 的开源自媒体项目，加上 Hypit、HyperFrames 等 GitHub 热门项目
+- 工具：[JuneYaooo](https://github.com/JuneYaooo) 的开源自媒体项目，以及 Hypit、HyperFrames 等开源项目
 - AI 视频生成两条路线：开源 MiniMax H3（自己在 AutoDL 租 GPU，或直接调 MiniMax / RunningHub 的 API），或 HyperFrames 代码视频
 - 演示与录屏：WorkBuddy
 
@@ -39,6 +39,6 @@ python3 scripts/build_site.py
 
 ## 内容范围
 
-账号、作品、数据、评论均为虚构；样片为课程自制，人物均为 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。
+演示账号的作品、数据、评论都是编的；样片是课程自己做的，人物都是 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。
 
 课程结构参考 [medical-teach](https://github.com/JuneYaooo/medical-teach)。
