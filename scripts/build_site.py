@@ -9,12 +9,12 @@ from urllib.parse import quote
 import mistune
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE = ROOT / 'AI视频教程'
-PACK_NAME = 'AI视频教程-练习包.zip'
+SITE = ROOT / '自媒体教程'
+PACK_NAME = '自媒体教程-练习包.zip'
 PACK_DIR = '阿夏的AI片场'
 WORKBUDDY_URL = 'https://www.workbuddy.cn'
 GITHUB_URL = 'https://github.com/JuneYaooo/media-teach'
-SITE_NAME = 'AI 视频博主课堂'
+SITE_NAME = '自媒体实战课堂'
 
 TRACKS = {
     'start': dict(name='入门', codes=['00', '01'], desc='认识案例、练习包和 WorkBuddy，装好本课程用到的技能。'),
@@ -151,7 +151,7 @@ pack_label = f'{pack_size / 1024 / 1024:.1f} MB' if pack_size > 1024 * 1024 else
 def shell(title, body, prefix='', bodyclass='', code=''):
     data = f' data-code="{code}"' if code else ''
     return f'''<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="AI 视频博主的 WorkBuddy 实操课程：找对标、账号诊断、视频拆解、爆款复刻、视频复刻、违规审核。"><meta name="theme-color" content="#252f6a"><title>{esc(title)} · {SITE_NAME}</title><link rel="icon" href="{prefix}assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{prefix}assets/site.css"><script src="{prefix}assets/site.js" defer></script></head><body class="{bodyclass}"{data}><a class="skip-link" href="#main">跳到正文</a>{body}</body></html>'''
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="自媒体人的 WorkBuddy 实操课程：找对标、账号诊断、视频拆解、爆款复刻、视频复刻、违规审核。"><meta name="theme-color" content="#252f6a"><title>{esc(title)} · {SITE_NAME}</title><link rel="icon" href="{prefix}assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{prefix}assets/site.css"><script src="{prefix}assets/site.js" defer></script></head><body class="{bodyclass}"{data}><a class="skip-link" href="#main">跳到正文</a>{body}</body></html>'''
 
 
 def brand(home):
@@ -192,7 +192,7 @@ def catalog(prefix=''):
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
         tracks += f'''<section class="course-group track" id="{key}"><div class="track-head"><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
-<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做 AI 视频号，<br>每一步都能核对。</h1><p class="hero-lead">跟着一个虚构的 AI 视频博主「阿夏」，在 WorkBuddy 里用开源技能完成从找对标到安全发布的全过程。每一步都拿到能打开、能核对的文件。</p><p class="hero-what">WorkBuddy 是腾讯推出的桌面 AI 助手：你用中文说清要做什么，它会读取你电脑上指定文件夹里的资料，调用技能分析数据、拆视频、写脚本、出片，并把结果保存成文件。不需要会编程。</p>
+<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">跟着一个虚构的自媒体账号「阿夏的AI片场」，在 WorkBuddy 里用开源技能完成从找对标到安全发布的全过程。每一步都拿到能打开、能核对的文件。</p><p class="hero-what">WorkBuddy 是腾讯推出的桌面 AI 助手：你用中文说清要做什么，它会读取你电脑上指定文件夹里的资料，调用技能分析数据、拆视频、写脚本、出片，并把结果保存成文件。不需要会编程。</p>
 <div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a>{pack_button(p)}</div>
 <p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课程 · 讲解录屏 · 可复制提示词 · 参考结果对照</p></div>
 <aside class="prepare" id="prepare"><h2>开始前准备</h2><ol>
@@ -329,7 +329,7 @@ for l in lessons:
     (SITE / '课程' / l['html']).write_text(shell(l['title'], body, '../', 'lesson-page', l['code']))
 
 (SITE / '课程目录.html').write_text(catalog())
-(ROOT / 'index.html').write_text(catalog('AI视频教程/'))
+(ROOT / 'index.html').write_text(catalog('自媒体教程/'))
 (ROOT / '.nojekyll').write_text('')
 (SITE / 'assets/courses.json').write_text(json.dumps(
     [{'code': l['code'], 'title': l['display'], 'url': '课程/' + l['html']} for l in lessons], ensure_ascii=False, indent=2))

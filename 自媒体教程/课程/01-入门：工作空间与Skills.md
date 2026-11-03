@@ -117,8 +117,8 @@ WorkBuddy 有两种装法：
 | [benchmark-outlier-radar](https://github.com/JuneYaooo/benchmark-outlier-radar) | 1-2 | GitHub 页面点 Code → Download ZIP，再“上传技能” | 不需要，纯本地脚本 |
 | [rea-video](https://github.com/JuneYaooo/rea-video) | 3-1、5-1 | 对 WorkBuddy 说“安装 https://github.com/JuneYaooo/rea-video ”（技能在仓库的 `skills/rea-video/`） | 可选：一个能看视频的模型（Gemini、豆包等），不配也能用 |
 | [self-media-compliance-review](https://github.com/JuneYaooo/self-media-compliance-review) | 6-1、6-2 | Download ZIP 后上传，或让 WorkBuddy 按 README 装 | 不需要；默认不联网 |
-| [Capsule Cinema](https://github.com/JuneYaooo/cheap-claude-video) | 5-1、5-2 | 让 WorkBuddy 按 [安装说明](https://raw.githubusercontent.com/JuneYaooo/cheap-claude-video/main/docs/install.md) 装（要 Python 3.12） | 生成渠道；本课程接 AutoDL 上的 H3 |
-| [open-source-video-gen-skill](https://github.com/mini-yifan/open-source-video-gen-skill) | 5-1 | 让 WorkBuddy 克隆仓库，把 `skills/` 下的 `minimax-h3`、`h3-prompt-writing`、`autodl-app-instance` 放进 WorkBuddy 的技能目录 | AutoDL 账号和 API Token |
+| [Capsule Cinema](https://github.com/JuneYaooo/cheap-claude-video) | 5-1、5-2 | 让 WorkBuddy 按 [安装说明](https://raw.githubusercontent.com/JuneYaooo/cheap-claude-video/main/docs/install.md) 装（要 Python 3.12） | 演示里只用它做分镜和质检；走“直接调 API”时，它也是生成渠道（MiniMax 或 RunningHub 的 API Key） |
+| [open-source-video-gen-skill](https://github.com/mini-yifan/open-source-video-gen-skill) | 5-1 | 让 WorkBuddy 克隆仓库，把 `skills/` 下的 `minimax-h3`、`h3-prompt-writing`、`autodl-app-instance` 放进 WorkBuddy 的技能目录 | AutoDL 账号和 API Token（只在“自己租 GPU”时需要） |
 | [Hypit](https://github.com/hypit-ai/hypit) | 4-2 | 终端运行 `npx skills add hypit-ai/hypit -g`，再确认 WorkBuddy 能识别 | 代码视频路线不需要模型 Key |
 | [HyperFrames](https://github.com/heygen-com/hyperframes) | 5-2 | 终端运行 `npx hyperframes skills update`（只装核心技能） | 不需要 |
 | [Douyin_TikTok_Download_API](https://github.com/Evil0ctal/Douyin_TikTok_Download_API) | 3-1（只讲不演示） | 本地用 Docker 运行 | 抖音需要自己的 Cookie |
