@@ -10,24 +10,21 @@
 <section class="lesson-overview" aria-label="本课概览"><dl><div><dt>难度</dt><dd>入门</dd></div><div><dt>时长</dt><dd>40 分钟（含安装）</dd></div><div><dt>前置</dt><dd>无</dd></div><div><dt>产出</dt><dd>环境检查表、已安装的技能、账号现状摘要</dd></div><div><dt>用到的工具</dt><dd>WorkBuddy；social-account-doctor、benchmark-outlier-radar 等本课程技能</dd></div></dl><p class="how"><strong>怎么学</strong>跟着步骤设好工作空间、装好技能，再生成第一个文件并核对。后面每一课都按这个循环来。</p><div class="overview-actions"><a class="secondary" href="../%E8%87%AA%E5%AA%92%E4%BD%93%E6%95%99%E7%A8%8B-%E7%BB%83%E4%B9%A0%E5%8C%85.zip" download>下载练习包 <span>145 KB</span></a><a class="secondary" href="#recording">看讲解录屏</a></div></section><section id="recording" class="recording"><h2>实操录屏</h2><p>录屏制作中。先按下面的提示词自己动手做，录屏上线后这里会自动出现。</p></section><details class="page-toc"><summary>本课目录</summary><nav aria-label="本课目录"><a href="#section-1">快速实操：照着提示词做一遍</a><a href="#section-2">完整方法：理解每一步，迁移到自己的账号</a><a href="#section-3">1. 选择工作空间</a><a href="#section-4">2. 检查电脑环境（实操 1）</a><a href="#section-5">3. 什么是技能（Skill）</a><a href="#section-6">4. 安装本课程的技能</a><a href="#section-7">5. 第一个任务：账号现状摘要（实操 3、4）</a><a href="#section-8">6. 写提示词的四个要素</a><a href="#section-9">7. 自查清单</a><a href="#section-10">8. 常见问题</a><a href="#section-11">9. 练习</a><a href="#section-12">下一课</a><a href="#section-13">本次任务结果与核对</a><a href="#section-14">操作画面</a></nav></details><h2 id="section-1">快速实操：照着提示词做一遍</h2>
 <p>先按“完整方法”第 1 步选好工作空间，再依次提交下面的提示词。实操 2 安装技能时，遇到填 API Key 的地方，自己在终端或文件里填，不要贴进对话。</p>
 <h3>实操 1</h3>
-<pre><code class="language-text">请检查这台电脑有没有装好：Python 3.10 以上、Node.js 22 以上、ffmpeg、git。逐个运行查看版本的命令，把结果列成一张表（工具、要求版本、实际版本、是否满足）。缺的告诉我在 macOS 上怎么装，先不要自己安装。
+<pre><code class="language-text">帮我检查一下这台电脑的 Python、Node.js、ffmpeg 和 git 装没装、版本够不够（Python 要 3.10 以上，Node.js 要 22 以上）。列个表给我看，缺的先别装，告诉我怎么装就行。
 </code></pre>
 <h3>实操 2</h3>
 <pre><code class="language-text">请帮我安装 social-account-doctor 技能，安装说明在：
 https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/install.md
-请先告诉我你打算把技能装到哪个目录、为什么装在那里能被识别，我确认后再装。需要填 API Key 时停下来，告诉我写到哪个文件的哪一行，我自己填，不要在对话里显示任何 Key。装完告诉我是否需要重启。
+装之前先告诉我打算装到哪里，我确认后再装。需要填 API Key 时停下来，告诉我填在哪，我自己填，不要在对话里显示任何 Key。
 </code></pre>
 <p>它说明打算装到哪个目录后，看一眼路径合理，再回复：</p>
 <pre><code class="language-text">确认，就装到这个目录。
 </code></pre>
 <h3>实操 3</h3>
-<pre><code class="language-text">请读取 资料/账号档案.md 和 资料/自己账号-作品数据.csv，写一份 200 字左右的账号现状摘要：粉丝数、作品数、更新频率、一般一条作品有多少播放、表现最好和最差的内容类型。需要计算的数字请写脚本算，不要估算；每个数字注明来自哪个文件。保存到 成果/01/账号现状摘要.md。
+<pre><code class="language-text">帮我看看阿夏这个账号现在什么情况：粉丝多少、发了多少条、多久更新一次、一条一般有多少播放、哪类内容最好和最差。写一份 200 字左右的摘要，放到 成果/01。数字要算出来，不要估，并注明出处。
 </code></pre>
 <h3>实操 4</h3>
-<pre><code class="language-text">请核对摘要里的两处数字：
-1. 账号档案里抖音粉丝是 5,800，这是净值；6,240 是累计新增关注，没有扣掉 440 个取关。摘要里的粉丝数应写 5,800。
-2. 42 条作品的播放均值约 1,152，但被几条爆款拉高了；中位数是 655。“一般一条有多少播放”应该用中位数，均值可以作为补充，并说明为什么两者差这么多。
-请修改 成果/01/账号现状摘要.md，并在文末列出每个数字的来源文件和算法。
+<pre><code class="language-text">摘要里有两个数字不对：粉丝应该是 5,800，6,240 是累计新增关注，没扣掉 440 个取关；“一般一条多少播放”要用中位数 655，均值 1,152 被几条爆款拉高了，只能作补充，并说明为什么差这么多。请改好，在文末写清每个数字的来源。
 </code></pre>
 <h2 id="section-2">完整方法：理解每一步，迁移到自己的账号</h2>
 <p>WorkBuddy 是一个能在你电脑上干活的 AI 助手：你用中文说要做什么，它会读指定文件夹里的资料、调用技能、运行脚本，把结果存成文件。这一课先把“干活的地方”和“干活的方法”准备好，再做一个小任务，练习最重要的习惯：<strong>AI 说完了，你要打开文件核对。</strong></p>
@@ -200,13 +197,13 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 <p><a href="https://github.com/JuneYaooo/awesome-ai-media-skills-cn">awesome-ai-media-skills-cn</a> 整理了 AI 视频和自媒体方向的技能、MCP 服务器和工具，按视频生成、多平台运营、内容自动化分类。想找新工具时先查这里，<a href="https://github.com/JuneYaooo/awesome-ai-media-cn">awesome-ai-media-cn</a> 则收录了 150 多个开源项目。</p>
 <h2 id="section-7">5. 第一个任务：账号现状摘要（实操 3、4）</h2>
 <p>技能装好后，做一个不需要技能的小任务，确认 WorkBuddy 能读写工作空间，也练习核对。</p>
-<p>提交实操 3。等文件卡片出现后，打开 <code>成果/01/账号现状摘要.md</code>，对着资料检查两个数字：</p>
+<p>提交实操 3。等文件卡片出现后，打开 <code>成果/01/</code> 里的摘要，对着资料检查两个数字：</p>
 <p><strong>检查点 1：粉丝数。</strong> 账号档案写的抖音粉丝是 5,800。作品数据里 <code>new_followers</code> 一列加起来是 6,240，那是累计新增关注，没扣掉 440 个取关。摘要写 6,240 就错了。</p>
 <p><strong>检查点 2：“一般一条多少播放”。</strong> 42 条作品的播放均值约 1,152，中位数 655。阿夏有几条九千多、六千多的爆款，把均值拉高了。说“一般一条一千多播放”会让人高估账号的常态。描述“一般”，用中位数更准。</p>
 <p>发现问题就提交实操 4。改完再打开文件看一遍，并到电脑的 <code>成果/01/</code> 文件夹里确认文件真的存在，不能只听 AI 说“已保存”。</p>
 <p><strong>为什么这样做</strong>：后面每一课的结论都建立在数字上。粉丝数错了，“量级差几倍”就会算错；均值当常态，“这条算不算爆”就会判错。</p>
 <h2 id="section-8">6. 写提示词的四个要素</h2>
-<p>每个任务写清楚四件事，结果会稳定很多：</p>
+<p>提示词不用写文件路径、文件名和命令。资料就在工作空间里，Agent 自己会找；文件名它会自己起；怎么算、跑什么命令是技能的事。你只要把需求说清楚：</p>
 <table>
 <thead>
 <tr>
@@ -217,19 +214,19 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 <tbody>
 <tr>
   <td>用什么技能</td>
-  <td>请使用 social-account-doctor 技能</td>
+  <td>用 social-account-doctor 技能（不需要技能的小任务可以不写）</td>
 </tr>
 <tr>
-  <td>输入是什么</td>
-  <td>资料/账号档案.md、资料/自己账号-作品数据.csv</td>
+  <td>要什么结果</td>
+  <td>帮我看看这个账号现在什么情况，写一份 200 字左右的摘要</td>
 </tr>
 <tr>
-  <td>要做什么、有什么限制</td>
-  <td>不联网搜索；数字用脚本算，不要估算；注明来源</td>
+  <td>有什么要求</td>
+  <td>数字要算出来，不要估；注明出处；这次不联网</td>
 </tr>
 <tr>
-  <td>结果存到哪</td>
-  <td>保存到 成果/01/账号现状摘要.md</td>
+  <td>放到哪</td>
+  <td>放到 成果/01（方便你自己找、后面的课接着用）</td>
 </tr>
 </tbody>
 </table>
@@ -240,7 +237,7 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 <li class="task-list-item"><input class="task-list-item-checkbox" type="checkbox" disabled/>social-account-doctor、benchmark-outlier-radar 在“已安装”列表里，开关打开</li>
 <li class="task-list-item"><input class="task-list-item-checkbox" type="checkbox" disabled/>API Key 没有出现在对话、截图或录屏里</li>
 <li class="task-list-item"><input class="task-list-item-checkbox" type="checkbox" disabled/>摘要里粉丝数是 5,800，“一般一条”用的是中位数 655</li>
-<li class="task-list-item"><input class="task-list-item-checkbox" type="checkbox" disabled/><code>成果/01/账号现状摘要.md</code> 在电脑文件夹里真的存在</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" type="checkbox" disabled/>摘要文件在电脑的 <code>成果/01/</code> 文件夹里真的存在</li>
 </ul>
 <h2 id="section-10">8. 常见问题</h2>
 <p><strong>提交后没看到文件？</strong> 先看输入框下方的工作空间是不是 <code>阿夏的AI片场</code>。再打开电脑上的 <code>成果</code> 文件夹确认。</p>
