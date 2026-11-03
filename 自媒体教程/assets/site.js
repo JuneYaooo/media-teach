@@ -104,19 +104,57 @@ if (video) {
   }));
 }
 
-// ---------- copy buttons on prompts ----------
-document.querySelectorAll('article pre:not(.mermaid)').forEach(pre => {
-  const code = pre.querySelector('code');
-  if (!code) return;
+// ---------- copy buttons: prompt cards and code blocks ----------
+function copyButton(getText) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'copy-button';
   button.textContent = '复制';
-  button.setAttribute('aria-label', '复制这段提示词或代码');
+  button.setAttribute('aria-label', '复制这段内容');
   button.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(code.textContent); button.textContent = '已复制'; }
+    try { await navigator.clipboard.writeText(getText()); button.textContent = '已复制 ✓'; }
     catch { button.textContent = '请选中文本复制'; }
     setTimeout(() => button.textContent = '复制', 2000);
   });
-  pre.append(button);
+  return button;
+}
+document.querySelectorAll('.prompt').forEach(box => {
+  const code = box.querySelector('code');
+  box.querySelector('.prompt-head').append(copyButton(() => code.textContent));
 });
+document.querySelectorAll('article pre:not(.mermaid):not(.prompt-body)').forEach(pre => {
+  const code = pre.querySelector('code');
+  if (code) pre.append(copyButton(() => code.textContent));
+});
+
+// ---------- checklists: tick items off (remembered in this browser) ----------
+if (lessonCode) {
+  const key = `media-teach:checks:${lessonCode}`;
+  let ticked = [];
+  try { ticked = JSON.parse(localStorage.getItem(key)) || []; } catch {}
+  document.querySelectorAll('.checks input[type=checkbox]').forEach((box, i) => {
+    box.disabled = false;
+    box.setAttribute('aria-label', box.parentElement.textContent.trim().slice(0, 30));
+    const paint = () => box.parentElement.classList.toggle('is-checked', box.checked);
+    box.checked = ticked.includes(i);
+    paint();
+    box.addEventListener('change', () => {
+      ticked = box.checked ? [...new Set([...ticked, i])] : ticked.filter(x => x !== i);
+      try { localStorage.setItem(key, JSON.stringify(ticked)); } catch {}
+      paint();
+    });
+  });
+}
+
+// ---------- outline: highlight the section being read ----------
+const railLinks = [...document.querySelectorAll('.toc-rail a')];
+if (railLinks.length && 'IntersectionObserver' in window) {
+  const byId = new Map(railLinks.map(a => [a.getAttribute('href').slice(1), a]));
+  const heads = [...byId.keys()].map(id => document.getElementById(id)).filter(Boolean);
+  const mark = id => railLinks.forEach(a => a.classList.toggle('active', a === byId.get(id)));
+  const io = new IntersectionObserver(() => {
+    const above = heads.filter(h => h.getBoundingClientRect().top < window.innerHeight * 0.3);
+    mark((above[above.length - 1] || heads[0]).id);
+  }, { rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
+  heads.forEach(h => io.observe(h));
+}

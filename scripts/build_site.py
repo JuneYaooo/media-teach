@@ -58,7 +58,8 @@ def render_md(text):
     out, last = '', 0
     for m in FOLD_RE.finditer(text):
         out += md(text[last:m.start()])
-        out += f'<details class="fold"><summary>{esc(m.group(1).strip())}</summary>{md(m.group(2))}</details>'
+        inner = md(m.group(2)).replace('<code class="language-text">', '<code class="language-shell">')
+        out += f'<details class="fold"><summary>{esc(m.group(1).strip())}</summary>{inner}</details>'
         last = m.end()
     return out + md(text[last:])
 
@@ -128,7 +129,9 @@ def facts_line(l):
     m, bits = l['meta'], []
     if '时长' in m: bits.append(re.sub(r'（.*?）$', '', m['时长']))
     if '难度' in m: bits.append(LEVEL.get(m['难度'], '难度 ' + m['难度']))
-    if '前置' in m and m['前置'] not in ('无', '—'): bits.append('前置 ' + short_prereq(m['前置']))
+    if '前置' in m and m['前置'] not in ('无', '—'):
+        codes = ' · '.join(dict.fromkeys(re.findall(CODE_RE, m['前置'])))
+        bits.append('先学 ' + (codes or short_prereq(m['前置'])))
     return ' · '.join(bits)
 
 
@@ -154,9 +157,9 @@ def catalog(prefix=''):
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
         tracks += f'''<section class="course-group track" id="{key}"><div class="track-head"><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
-<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你做出结果，自己打开核对。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
+<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>找对标、拆爆款、写脚本，<br>交给 AI 去做。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你做出结果，自己打开核对。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
 <div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a><a class="secondary" href="#prepare">开始前准备</a></div>
-<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课程 · 原理流程图 · 讲解录屏 · 可复制提示词</p></div>
+<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课 · 每课一张原理图 · 提示词一键复制 · 每一步都能核对</p></div>
 <aside class="prepare" id="prepare"><h2>开始前准备</h2><ol>
 <li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。用起来会扣积分，规则看应用内说明。</p></div></li>
 <li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图，再挑一两条想学的对标爆款视频。还没起号的，想好一句话：做什么内容，给谁看。</p></div></li>
@@ -210,30 +213,56 @@ def sidebar(current):
     return out + '</nav></details>'
 
 
-def overview(l):
+KINDS = [('它是怎么工作的', 'how', '原理'), ('你要准备什么', 'prep', '准备'), ('动手', 'do', '动手'),
+         ('你会拿到什么', 'get', '产出'), ('怎么核对结果', 'check', '核对'), ('常见问题', 'faq', '答疑'),
+         ('进阶与边界', 'more', '进阶'), ('下一课', 'next', '下一步'), ('本次任务结果与核对', 'demo', '演示'),
+         ('操作画面', 'shots', '截图')]
+KIND_LABEL = {k: lab for _, k, lab in KINDS}
+PATH_STEPS = [('how', '看懂原理'), ('prep', '准备材料'), ('do', '动手做'), ('check', '核对结果')]
+
+
+def kind_of(title):
+    return next((k for t, k, _ in KINDS if title.startswith(t)), 'plain')
+
+
+def split_top(s):
+    """Split on ；、 that are not inside brackets."""
+    out, cur, depth = [], '', 0
+    for ch in s:
+        depth += (ch in '（(') - (ch in '）)')
+        if ch in '；;、' and depth == 0:
+            out.append(cur.strip()); cur = ''
+        else:
+            cur += ch
+    return [x for x in out + [cur.strip()] if x]
+
+
+def overview(l, anchors):
     m = l['meta']
-    rows = ''
-    for key in META_KEYS:
-        if key not in m: continue
-        val = link_codes(m[key]) if key == '前置' else esc(LEVEL.get(m[key], m[key]) if key == '难度' else m[key])
-        rows += f'<div><dt>{key}</dt><dd>{val}</dd></div>'
-    if l['code'] == '00':
-        how = '读完路线说明后，回到目录从 01 入门开始。'
-    elif l['code'] == '01':
-        how = '跟着步骤建好工作文件夹、装好技能、配好 Key，再跑一个小任务确认一切可用。'
-    else:
-        how = ('先看“它是怎么工作的”弄懂原理，再看讲解录屏；然后把提示词里的 &lt;尖括号&gt; 换成你自己的账号或材料，提交给 WorkBuddy；'
-               '最后用“怎么核对结果”检查。AI 每次的结果都不一样，发现问题就直接告诉它哪里不对、为什么。')
-    return (f'<section class="lesson-overview" aria-label="本课概览">' + (f'<dl>{rows}</dl>' if rows else '') +
-            f'<p class="how"><strong>怎么学</strong>{how}</p><div class="overview-actions">'
-            f'<a class="secondary" href="#recording">看讲解录屏</a></div></section>')
+    facts = ''
+    if '时长' in m:
+        facts += f'<span class="fact" title="{esc(m["时长"])}"><b>时长</b>{esc(re.sub(r"（.*?）", "", m["时长"]))}</span>'
+    if '难度' in m:
+        facts += f'<span class="fact"><b>难度</b>{esc(LEVEL.get(m["难度"], m["难度"]))}</span>'
+    if '前置' in m and m['前置'] not in ('无', '—'):
+        codes = ' · '.join(dict.fromkeys(re.findall(CODE_RE, m['前置'])))
+        facts += f'<span class="fact" title="{esc(m["前置"])}"><b>先学</b>{link_codes(codes) if codes else esc(short_prereq(m["前置"]))}</span>'
+    if not l['chapters']:
+        facts += '<span class="fact rec"><b>录屏</b>制作中</span>'
+    get = f'<div class="get"><b>学完你会拿到</b><p>{esc(m["产出"])}</p></div>' if '产出' in m else ''
+    tools = ''
+    if '用到的工具' in m:
+        tools = '<div class="tools"><b>用到</b>' + ''.join(f'<span>{esc(t)}</span>' for t in split_top(m['用到的工具'])) + '</div>'
+    steps = [(k, lab) for k, lab in PATH_STEPS if k in anchors]
+    path = ''.join(f'<li><a href="#{anchors[k]}"><i>{i}</i>{lab}</a></li>' for i, (k, lab) in enumerate(steps, 1))
+    path = f'<ol class="path" aria-label="这一课怎么学">{path}</ol>' if path else ''
+    return f'<section class="summary" aria-label="本课概览"><div class="facts">{facts}</div>{get}{tools}{path}</section>'
 
 
 def recording(l):
     chapters = l['chapters']
     if not chapters:
-        return ('<section id="recording" class="recording"><h2>实操录屏</h2>'
-                '<p>录屏制作中。先按下面的提示词自己动手做，录屏上线后这里会自动出现。</p></section>')
+        return ''
     out = (f'<section id="recording" class="recording"><h2>实操录屏</h2><p>带旁白和字幕，约 {round(chapters[-1]["end"] / 60) or 1} 分钟。点下面的阶段可以直接跳过去。</p>'
            f'<video id="lesson-video" controls playsinline preload="metadata" aria-label="{l["code"]} WorkBuddy 实操录屏">'
            f'<source src="../录屏/{url(l["video"].name)}" type="video/mp4">'
@@ -265,8 +294,67 @@ def drop_missing_video_link(l, text):
     return re.sub(r'^\[观看 .*?实操录屏\]\(.*?\)( · \[字幕\]\(.*?\))?\s*$', '', text, flags=re.M)
 
 
+def prompt_box(m):
+    body = re.sub(r'&lt;([^&\n]{1,60}?)&gt;', r'<mark class="ph">&lt;\1&gt;</mark>', m.group(1))
+    return ('<div class="prompt"><div class="prompt-head"><span class="prompt-label">发给 WorkBuddy</span></div>'
+            f'<pre class="prompt-body"><code>{body}</code></pre></div>')
+
+
+def callouts(rendered):
+    def bq(m):
+        text = re.sub('<[^>]+>', '', m.group(1)).strip()
+        cls = 'opt' if text.startswith('选学') else 'warn' if '以试跑为准' in text else 'note'
+        return f'<aside class="callout {cls}">{m.group(1)}</aside>'
+    return re.sub(r'<blockquote>(.*?)</blockquote>', bq, rendered, flags=re.S)
+
+
+def faq_items(sec):
+    """`**问题？** 回答` paragraphs become an accordion."""
+    parts = re.split(r'<p><strong>([^<]*?[？?])</strong>\s*', sec)
+    if len(parts) < 3: return sec
+    out = parts[0]
+    for i in range(1, len(parts), 2):
+        out += f'<details class="qa"><summary>{parts[i]}</summary><div class="qa-a"><p>{parts[i + 1].strip()}</div></details>'
+    return out
+
+
+TASK_H3 = r'<h3>((?:实操 ?\d+|第 ?\d+ ?步)[^<：]*?)[：:]\s*(.*?)</h3>'
+
+
+def lesson_sections(rendered):
+    """Wrap each <h2> section in <section class="sec sec-KIND">, restyle it per kind, build the outline."""
+    chunks = re.split(r'(?=<h2>)', callouts(rendered))
+    secs, anchors = [], {}
+    for i, ch in enumerate(chunks[1:], 1):
+        title = re.sub('<[^>]+>', '', re.match(r'<h2>(.*?)</h2>', ch, re.S).group(1))
+        kind, anchor = kind_of(title), f'section-{i}'
+        anchors.setdefault(kind, anchor)
+        ch = ch.replace('<h2>', f'<h2 id="{anchor}">', 1)
+        if kind == 'how':
+            ch = re.sub(r'<li><strong>(.*?)</strong>[：:]\s*', r'<li><strong class="step-title">\1</strong>', ch)
+        ch = re.sub(TASK_H3, r'<h3 class="task"><span class="task-no">\1</span>\2</h3>', ch)
+        if kind == 'check':
+            ch = ch.replace('<ul>\n<li class="task-list-item">', '<ul class="checks">\n<li class="task-list-item">')
+            ch = re.sub(r'(<input class="task-list-item-checkbox"[^>]*>)(.*?)</li>', r'\1<span>\2</span></li>', ch, flags=re.S)
+        if kind == 'faq':
+            ch = faq_items(ch)
+        label = f'<span class="sec-label">{KIND_LABEL[kind]}</span>' if kind in KIND_LABEL else ''
+        secs.append({'kind': kind, 'anchor': anchor, 'title': title, 'html': f'<section class="sec sec-{kind}">{label}{ch}</section>'})
+    # Until the recording exists, the demo result and screenshot sections are placeholders: fold them into one note.
+    demo = next((x for x in secs if x['kind'] == 'demo'), None)
+    shots = next((x for x in secs if x['kind'] == 'shots'), None)
+    if demo and shots and '待补' in demo['html'] and '<img' not in shots['html']:
+        note = re.search(r'<p>(.*?)</p>', demo['html'], re.S)
+        demo.update(kind='pending', html='<section class="sec sec-pending"><div class="pending-box"><b>录屏演示制作中</b>'
+                    + (f'<p>{note.group(1)}</p>' if note else '')
+                    + '<p class="muted">录好后，这里会放演示账号“阿夏的AI片场”的实际结果和操作截图。</p></div></section>')
+        secs.remove(shots)
+    toc = [(x['anchor'], x['title'], x['kind']) for x in secs if x['kind'] != 'pending']
+    return chunks[0] + ''.join(x['html'] for x in secs), toc, anchors
+
+
 MERMAID = ('<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";'
-           'mermaid.initialize({startOnLoad:true,theme:"base",themeVariables:{primaryColor:"#eef0f8",primaryBorderColor:"#3a4a9c",lineColor:"#5a5e72",fontSize:"15px"}});</script>')
+           'mermaid.initialize({startOnLoad:true,theme:"base",flowchart:{nodeSpacing:28,rankSpacing:36,padding:8,diagramPadding:4},themeVariables:{primaryColor:"#eef0f8",primaryBorderColor:"#3a4a9c",lineColor:"#8a8fa8",fontSize:"16px",fontFamily:"-apple-system,PingFang SC,Microsoft YaHei,sans-serif"}});</script>')
 
 
 def fix_material_links(rendered):
@@ -280,16 +368,17 @@ for l in lessons:
     rendered = re.sub(r'<img ', '<img loading="lazy" decoding="async" ', rendered)
     rendered = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<figure class="flow"><pre class="mermaid">\1</pre></figure>', rendered, flags=re.S)
     rendered = re.sub(r'<h4>(作者原文示例[^<]*)</h4>\s*(<pre>.*?</pre>)', r'<details class="author-example"><summary>\1</summary>\2</details>', rendered, flags=re.S)
-    sections = []
-
-    def heading(m):
-        label = re.sub('<[^>]+>', '', m.group(1)); anchor = 'section-' + str(len(sections) + 1); sections.append((anchor, label))
-        return f'<h2 id="{anchor}">{m.group(1)}</h2>'
-    rendered = re.sub(r'<h2>(.*?)</h2>', heading, rendered, flags=re.S)
     rendered = shots_gallery(rendered)
-    toc = '<details class="page-toc"><summary>本课目录</summary><nav aria-label="本课目录">' + ''.join(f'<a href="#{a}">{t}</a>' for a, t in sections) + '</nav></details>'
-    cut = rendered.find('<h2')
-    intro, rest = (rendered[:cut], rendered[cut:]) if cut >= 0 else (rendered, '')
+    rendered = rendered.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
+    rendered = re.sub(r'<pre><code class="language-text">(.*?)</code></pre>', prompt_box, rendered, flags=re.S)
+    article, toc_items, anchors = lesson_sections(rendered)
+    rail = ('<nav class="toc-rail" aria-label="本课目录"><p>本课目录</p>' + ''.join(
+        f'<a href="#{a}" data-kind="{k}">{t}</a>' for a, t, k in toc_items) + '</nav>')
+    toc = ('<details class="page-toc"><summary>本课目录</summary><nav aria-label="本课目录">' + ''.join(
+        f'<a href="#{a}">{t}</a>' for a, t, k in toc_items) + '</nav></details>')
+    cut = article.find('<section class="sec')
+    intro, rest = (article[:cut], article[cut:]) if cut >= 0 else (article, '')
+    intro = re.sub(r'(</h1>\s*)<p>', r'\1<p class="lead">', intro, count=1)
     t = TRACKS[l['track']]
     pos = t['codes'].index(l['code']) + 1
     kicker = f'<div class="lesson-kicker"><span>{t["name"]} · 第 {pos} / {len(t["codes"])} 课</span><span class="done-flag" hidden>✓ 已学完</span></div>'
@@ -297,8 +386,9 @@ for l in lessons:
     body = (f'<header class="site-header">{brand("../课程目录.html")}<nav aria-label="主导航"><a href="../课程目录.html">课程目录</a>'
             f'<a href="{url(l["path"].name)}" download>下载本课 Markdown</a></nav></header>'
             f'<div class="lesson-layout"><aside class="sidebar">{sidebar(l)}</aside><main id="main" class="lesson">{kicker}'
-            f'<article>{intro}{overview(l)}{recording(l)}{toc}{rest}</article>{done}{pager(l["code"])}'
-            f'<footer class="lesson-footer">练习素材均为虚构。复刻只学做法，发布前请做违规审核；平台规则以最新公告为准。</footer></main></div>')
+            f'<article>{intro}{overview(l, anchors)}{recording(l)}{toc}{rest}</article>{done}{pager(l["code"])}'
+            f'<footer class="lesson-footer">演示账号的数据为虚构。复刻只学做法，发布前请做违规审核；平台规则以最新公告为准。</footer></main>'
+            f'<aside class="rail">{rail}</aside></div>')
     if 'class="mermaid"' in body: body += MERMAID
     (SITE / '课程' / l['html']).write_text(shell(l['title'], body, '../', 'lesson-page', l['code']))
 
