@@ -24,6 +24,9 @@ TRACKS = {
     'm6': dict(name='⑥ 违规审核', codes=['6-1', '6-2'], desc='这条能不能发？账号为什么被限流？'),
     'end': dict(name='结课', codes=['07'], desc='一条视频从找对标走到可发布。'),
 }
+MOD = {'start': ('#5a6178', 'rocket'), 'm1': ('#3a4a9c', 'crosshair'), 'm2': ('#0f766e', 'stethoscope'),
+       'm3': ('#7c4dbd', 'scissors'), 'm4': ('#c2410c', 'pen-line'), 'm5': ('#be185d', 'clapperboard'),
+       'm6': ('#b42318', 'shield-check'), 'end': ('#2f7a4f', 'refresh-cw')}
 ORDER = [c for t in TRACKS.values() for c in t['codes']]
 FOCUS = {
     '00': '这门课帮你省掉哪些活儿、怎么学、名词小抄、大概花多少钱。',
@@ -145,6 +148,14 @@ def course_card(l, prefix):
             '</span><span class="course-state" aria-hidden="true"></span></a></li>')
 
 
+def course_map():
+    m = re.search(r'```flow\n(.*?)```', by_code['00']['text'], re.S) if '00' in by_code else None
+    if not m: return ''
+    return ('<section class="course-map"><div class="section-heading"><div><span class="eyebrow">一张图看懂</span>'
+            '<h2>一个账号每周要做的事，都在这一圈里</h2></div><p>每一步对应一个模块。学完一圈，下周带着周报再来。</p></div>'
+            + flow_block(type('M', (), {'group': lambda self, i: html.escape(m.group(1))})()) + '</section>')
+
+
 def catalog(prefix=''):
     p = prefix
     first = by_code.get('01') or lessons[0]
@@ -155,7 +166,7 @@ def catalog(prefix=''):
     for key, t in TRACKS.items():
         if key == 'start' or not t['codes']: continue
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
-        tracks += f'''<section class="course-group track" id="{key}"><div class="track-head"><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
+        tracks += f'''<section class="course-group track" id="{key}" style="--mod:{MOD[key][0]}"><div class="track-head"><span class="mod-badge">{icon(MOD[key][1])}</span><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
 <main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>找对标、拆爆款、写脚本，<br>交给 AI 去做。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你做出结果，自己打开核对。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
 <div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a><a class="secondary" href="#prepare">开始前准备</a></div>
@@ -166,6 +177,7 @@ def catalog(prefix=''):
 <li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它当工作空间，之后的结果都存在这里。</p></div></li>
 <li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你申请看图 Key、装第一个技能。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号，再核对结果。拍实拍、做口播的，模块⑤可以跳过。</p></div></li>
 </ol></aside></section>
+{course_map()}
 {start}
 <div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块是连着的，前一课的结果就是后一课的材料。只想学某一课也行，把提示词里的材料换成你手上有的。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
 <p id="search-empty" hidden>没找到，试试“对标”“复刻”或课号。</p>
@@ -294,6 +306,38 @@ def drop_missing_video_link(l, text):
     return re.sub(r'^\[观看 .*?实操录屏\]\(.*?\)( · \[字幕\]\(.*?\))?\s*$', '', text, flags=re.M)
 
 
+ICON_DIR = SITE / 'assets' / 'icons'
+
+
+def icon(name, cls='ic'):
+    """Inline a Lucide icon (assets/icons, ISC licence) so it takes the text colour."""
+    f = ICON_DIR / f'{name}.svg'
+    if not f.exists(): return ''
+    svg = re.sub(r'<!--.*?-->', '', f.read_text(), flags=re.S).strip()
+    svg = re.sub(r'\s+', ' ', svg).replace('class="lucide', f'aria-hidden="true" class="{cls} lucide', 1)
+    return re.sub(r' (width|height)="24"', '', svg)
+
+
+ACTORS = {'你': ('you', '你来做'), 'AI': ('ai', 'AI 判断'), '技能': ('tool', '技能 / 脚本'), '平台': ('web', '上平台 / 云端'),
+          '结果': ('out', '拿到结果'), '找对标': ('m1', ''), '诊断': ('m2', ''), '拆解': ('m3', ''), '复刻': ('m4', ''),
+          '出片': ('m5', ''), '审核': ('m6', ''), '复盘': ('end', '')}
+
+
+def flow_block(m):
+    """```flow lines `角色|图标|标题|说明` -> illustrated step cards."""
+    steps, used = '', []
+    lines = [l for l in html.unescape(m.group(1)).strip().splitlines() if l.strip()]
+    for i, line in enumerate(lines, 1):
+        who, ic, title, note = (x.strip() for x in (line.split('|') + ['', '', ''])[:4])
+        cls, legend = ACTORS.get(who, ('ai', ''))
+        if legend and cls not in [u[0] for u in used]: used.append((cls, legend))
+        steps += (f'<li class="fx fx-{cls}"><span class="fx-top"><span class="fx-ic">{icon(ic)}</span>'
+                  f'<span class="fx-no">{i:02d}</span><span class="fx-who">{esc(who)}</span></span>'
+                  f'<strong>{esc(title)}</strong>' + (f'<small>{esc(note)}</small>' if note else '') + '</li>')
+    legend = ''.join(f'<span class="lg lg-{c}"><i></i>{t}</span>' for c, t in used)
+    return (f'<figure class="flowx"><ol>{steps}</ol>' + (f'<figcaption>{legend}</figcaption>' if legend else '') + '</figure>')
+
+
 def prompt_box(m):
     body = re.sub(r'&lt;([^&\n]{1,60}?)&gt;', r'<mark class="ph">&lt;\1&gt;</mark>', m.group(1))
     return ('<div class="prompt"><div class="prompt-head"><span class="prompt-label">发给 WorkBuddy</span></div>'
@@ -321,7 +365,7 @@ def faq_items(sec):
 TASK_H3 = r'<h3>((?:实操 ?\d+|第 ?\d+ ?步)[^<：]*?)[：:]\s*(.*?)</h3>'
 
 
-def lesson_sections(rendered):
+def lesson_sections(rendered, code=''):
     """Wrap each <h2> section in <section class="sec sec-KIND">, restyle it per kind, build the outline."""
     chunks = re.split(r'(?=<h2>)', callouts(rendered))
     secs, anchors = [], {}
@@ -338,6 +382,9 @@ def lesson_sections(rendered):
             ch = re.sub(r'(<input class="task-list-item-checkbox"[^>]*>)(.*?)</li>', r'\1<span>\2</span></li>', ch, flags=re.S)
         if kind == 'faq':
             ch = faq_items(ch)
+        mock = SITE / '示意图' / f'{code}.html'
+        if kind == 'get' and mock.exists():
+            ch = re.sub(r'(</h2>)', r'\1' + mock.read_text().replace('\\', '\\\\'), ch, count=1)
         label = f'<span class="sec-label">{KIND_LABEL[kind]}</span>' if kind in KIND_LABEL else ''
         secs.append({'kind': kind, 'anchor': anchor, 'title': title, 'html': f'<section class="sec sec-{kind}">{label}{ch}</section>'})
     # Until the recording exists, the demo result and screenshot sections are placeholders: fold them into one note.
@@ -370,8 +417,9 @@ for l in lessons:
     rendered = re.sub(r'<h4>(作者原文示例[^<]*)</h4>\s*(<pre>.*?</pre>)', r'<details class="author-example"><summary>\1</summary>\2</details>', rendered, flags=re.S)
     rendered = shots_gallery(rendered)
     rendered = rendered.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
+    rendered = re.sub(r'<pre><code class="language-flow">(.*?)</code></pre>', flow_block, rendered, flags=re.S)
     rendered = re.sub(r'<pre><code class="language-text">(.*?)</code></pre>', prompt_box, rendered, flags=re.S)
-    article, toc_items, anchors = lesson_sections(rendered)
+    article, toc_items, anchors = lesson_sections(rendered, l['code'])
     rail = ('<nav class="toc-rail" aria-label="本课目录"><p>本课目录</p>' + ''.join(
         f'<a href="#{a}" data-kind="{k}">{t}</a>' for a, t, k in toc_items) + '</nav>')
     toc = ('<details class="page-toc"><summary>本课目录</summary><nav aria-label="本课目录">' + ''.join(
@@ -381,11 +429,13 @@ for l in lessons:
     intro = re.sub(r'(</h1>\s*)<p>', r'\1<p class="lead">', intro, count=1)
     t = TRACKS[l['track']]
     pos = t['codes'].index(l['code']) + 1
-    kicker = f'<div class="lesson-kicker"><span>{t["name"]} · 第 {pos} / {len(t["codes"])} 课</span><span class="done-flag" hidden>✓ 已学完</span></div>'
+    color, mic = MOD[l['track']]
+    kicker = (f'<div class="lesson-kicker"><span class="mod-badge">{icon(mic)}</span><span>{t["name"]} · 第 {pos} / {len(t["codes"])} 课</span>'
+              f'<span class="done-flag" hidden>✓ 已学完</span></div>')
     done = '<div class="mark-done"><button type="button" id="mark-done" aria-pressed="false">标记本课已学完</button><span>进度只保存在当前浏览器里。</span></div>'
     body = (f'<header class="site-header">{brand("../课程目录.html")}<nav aria-label="主导航"><a href="../课程目录.html">课程目录</a>'
             f'<a href="{url(l["path"].name)}" download>下载本课 Markdown</a></nav></header>'
-            f'<div class="lesson-layout"><aside class="sidebar">{sidebar(l)}</aside><main id="main" class="lesson">{kicker}'
+            f'<div class="lesson-layout"><aside class="sidebar">{sidebar(l)}</aside><main id="main" class="lesson" style="--mod:{color}">{kicker}'
             f'<article>{intro}{overview(l, anchors)}{recording(l)}{toc}{rest}</article>{done}{pager(l["code"])}'
             f'<footer class="lesson-footer">演示账号的数据为虚构。复刻只学做法，发布前请做违规审核；平台规则以最新公告为准。</footer></main>'
             f'<aside class="rail">{rail}</aside></div>')

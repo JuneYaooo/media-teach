@@ -16,17 +16,15 @@ AI 生成的画面里，字总是歪的、错的；好不容易做完一条，�
 
 ## 它是怎么工作的
 
-```mermaid
-flowchart TB
-  subgraph R1[" "]
-    direction LR
-    A[3-1 报告里的<br>花字样式和时间] --> B[做成能换字的<br>动效模板] --> C[预览后<br>导出视频] --> D[替换进<br>5-1 初版成片]
-  end
-  subgraph R2[" "]
-    direction LR
-    E[质量检查<br>黑屏 音量 字幕位置] --> F[只返工最差一镜<br>其他镜头不动] --> G[最终版成片] --> H[存成配方<br>下一期只换题材]
-  end
-  R1 --> R2
+```flow
+你|file-text|花字参数|3-1 报告里的样式和时间
+技能|code|做成模板|能换字的动效
+技能|play|预览导出|渲染成视频
+技能|combine|替换进成片|换掉初版里的占位
+技能|shield-check|质量检查|黑屏、音量、字幕位置
+AI|wrench|只返工一镜|其他镜头不动
+结果|film|终版成片|可以去审核了
+结果|book-marked|存成配方|下一期只换题材
 ```
 
 **HyperFrames 这一半**：

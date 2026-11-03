@@ -14,17 +14,14 @@ AI 工具一大堆，不知道从哪下手？这一课只做四件事：建一�
 
 ## 它是怎么工作的
 
-```mermaid
-flowchart TB
-  subgraph R1[" "]
-    direction LR
-    A[你用中文<br>说需求] --> B[WorkBuddy 挑出<br>该用的技能] --> C[按技能里写好的<br>步骤和规矩做] --> D[打开网页 看图<br>算数据]
-  end
-  subgraph R2[" "]
-    direction LR
-    E[缺东西、要花钱<br>先停下来问你] --> F[结果存进<br>工作文件夹] --> G[你打开文件<br>核对]
-  end
-  R1 --> R2
+```flow
+你|message-square-text|说需求|用中文说清要什么
+AI|bot|挑技能|WorkBuddy 找到对应的技能
+技能|book-open|按手册做|步骤和规矩都写在技能里
+AI|globe|动手干活|打开网页、看图、算数据
+你|hand|缺东西先问你|没 Key、要花钱都先停下
+技能|folder-open|结果存成文件|放进你的工作文件夹
+结果|badge-check|你来核对|打开文件看过才算
 ```
 
 可以把 WorkBuddy 想成一个助理，把技能想成交给助理的一本操作手册。

@@ -16,17 +16,15 @@
 
 ## 它是怎么工作的
 
-```mermaid
-flowchart TB
-  subgraph R1[" "]
-    direction LR
-    A[参考视频] --> B[看画面<br>有哪些卡片 字幕 贴图] --> C[口播转文字<br>记下每个词的时间] --> D[找留人点<br>每个切换跟着哪个词]
-  end
-  subgraph R2[" "]
-    direction LR
-    E[写成模板<br>画面跟着词走] --> F[换成你的台词<br>和素材] --> G[代码出片<br>需要时才调 AI] --> H[第一版成片<br>+ 只改一处的变体]
-  end
-  R1 --> R2
+```flow
+你|file-video|参考视频|字幕卡片、榜单类
+AI|eye|看画面|卡片、字幕、贴图
+AI|mic|逐词转写|记下每个词的时间
+AI|anchor|找留人点|每次切换跟着哪个词
+技能|layout-template|写成模板|画面跟着词走
+你|replace|换成你的内容|台词和素材
+技能|code|代码出片|需要时才调 AI
+结果|copy|初版 + 变体|每个变体只改一处
 ```
 
 1. **看画面**：Hypit 先看参考视频，弄清有哪些画面元素：卡片、字幕、贴图、B-roll（穿插的补充画面）。
