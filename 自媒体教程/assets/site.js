@@ -105,7 +105,7 @@ if (video) {
 }
 
 // ---------- copy buttons on prompts ----------
-document.querySelectorAll('article pre').forEach(pre => {
+document.querySelectorAll('article pre:not(.mermaid)').forEach(pre => {
   const code = pre.querySelector('code');
   if (!code) return;
   const button = document.createElement('button');

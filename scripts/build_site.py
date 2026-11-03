@@ -4,20 +4,18 @@ Recordings are optional: a lesson without `录屏/<code>-WorkBuddy实操.json` s
 "录屏制作中" notice instead of the video player.
 """
 from pathlib import Path
-import html, json, re, zipfile
+import html, json, re
 from urllib.parse import quote, unquote
 import mistune
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / '自媒体教程'
-PACK_NAME = '自媒体教程-练习包.zip'
-PACK_DIR = '阿夏的AI片场'
 WORKBUDDY_URL = 'https://www.workbuddy.cn'
 GITHUB_URL = 'https://github.com/JuneYaooo/media-teach'
 SITE_NAME = '自媒体实战课堂'
 
 TRACKS = {
-    'start': dict(name='入门', codes=['00', '01'], desc='认识案例、练习包和 WorkBuddy，装好本课程用到的技能。'),
+    'start': dict(name='入门', codes=['00', '01'], desc='认识课程路线和 WorkBuddy，装好技能、配好 Key。'),
     'm1': dict(name='① 找对标', codes=['1-1', '1-2'], desc='谁才是真对标？对标这周出了什么爆款？'),
     'm2': dict(name='② 账号诊断', codes=['2-1', '2-2'], desc='我的号差在哪？这一条为什么不爆？'),
     'm3': dict(name='③ 视频拆解（逆向）', codes=['3-1', '3-2'], desc='爆款的画面、剪辑、声音、钩子和文案是怎么做的？'),
@@ -28,23 +26,23 @@ TRACKS = {
 }
 ORDER = [c for t in TRACKS.values() for c in t['codes']]
 FOCUS = {
-    '00': '课程路线、贯穿案例、练习包和两条视频生成路线。',
-    '01': '设好工作空间，装好技能，学会打开文件核对结果。',
-    '1-1': '从候选账号里筛出真对标，排除看着像的干扰项。',
-    '1-2': '用中位数倍数找出对标的异常爆款，选出本周要拆的。',
-    '2-1': '对比对标，看清自己的强项、短板和下一步动作。',
-    '2-2': '读后台数据，找出一条作品没起量的真正原因。',
-    '3-1': '逐镜拆出 AI 短剧的画面、花字、剪辑和声音。',
-    '3-2': '拆钩子、结构和评论区，整理成爆款拆解卡。',
-    '4-1': '沿用爆款结构，写出自己选题的脚本和标题封面。',
-    '4-2': '用 Hypit 把爆款克隆成工作流，批量出变体。',
-    '5-1': '在 AutoDL 上用开源 H3 还原 AI 镜头。',
-    '5-2': '用 HyperFrames 复刻花字和动效，存成可复用配方。',
-    '6-1': '发布前做五级风险审核，按证据修改后复审。',
-    '6-2': '排查限流原因，区分平台规则和经验，准备申诉。',
-    '07': '把六个模块串起来，交付一个可发布的作品包。',
+    '00': '课程路线、每课结构、要准备什么、两条视频生成路线。',
+    '01': '建好工作文件夹，装好技能、配好 Key，跑通第一个任务。',
+    '1-1': '用 social-account-doctor 按你的账号特征全网实搜对标。',
+    '1-2': '用 benchmark-outlier-radar 算倍数，找出对标这周真正爆的那条。',
+    '2-1': '用诊断模式给你的账号做漏斗、对标扫描和六维体检。',
+    '2-2': '上传一条作品的后台数据，找出它卡在漏斗哪一层。',
+    '3-1': '用 rea-video 逐镜拆出一条爆款的画面、花字、剪辑和声音。',
+    '3-2': '用拆爆款模式拆钩子、骨架和评论区，找出可复用的动作。',
+    '4-1': '用仿写模式套用爆款结构，写出你自己选题的标题、开头和脚本。',
+    '4-2': '用 Hypit 把爆款克隆成工作流，换成你的内容，批量出变体。',
+    '5-1': '按复刻方案，用开源 H3 生成 AI 镜头：租 GPU 或调 API。',
+    '5-2': '用 HyperFrames 做可复用的花字模板，存成下集能用的配方。',
+    '6-1': '发布前用合规技能审你的成片：逐条定位、定级、改完复审。',
+    '6-2': '被限流后排查原因，先整改再申诉，准备申诉材料。',
+    '07': '用你自己的账号跑通全流程，变成每周循环。',
 }
-EXTRA_META = {'00': {'产出': '选定学习顺序，下载练习包'}}
+EXTRA_META = {'00': {'产出': '选定学习顺序，准备好自己的账号资料'}}
 LEVEL = {'1': '入门', '1-2': '基础', '2': '基础', '2-3': '进阶', '3': '进阶'}
 META_KEYS = ['难度', '时长', '前置', '产出', '用到的工具']
 CODE_RE = r'(?<![0-9-])(?:[1-6]-[12]|0[017])(?![0-9-])'
@@ -102,51 +100,6 @@ ORDER = [l['code'] for l in lessons]
 for t in TRACKS.values(): t['codes'] = [c for c in t['codes'] if c in by_code]
 
 
-# ---------- practice pack ----------
-def build_pack():
-    """Zip the practice workspace. Fixed timestamps keep the file stable between builds."""
-    target = SITE / PACK_NAME
-    readme = f'''{SITE_NAME} · 练习包
-
-1. 把整个“{PACK_DIR}”文件夹放在你方便找到的位置。
-2. 打开 WorkBuddy，点击“新建任务”→“选择工作空间”→“打开本地文件夹”，选中“{PACK_DIR}”。
-3. 打开课程网站，从“01 入门”开始，把每课的提示词复制到 WorkBuddy。
-
-文件夹说明
-- 资料/：每课要读取的练习文件（账号档案、作品数据、对标快照、爆款样片、评论区、发布资料等）。
-- 成果/：空文件夹，你每课的结果保存在“成果/课号/”。
-- 参考结果/：课程作者实际跑出的结果，用来和你的结果对照。
-  跳过某课时，把对应文件夹复制到“成果/”。例如没做 3-1 想直接学 5-1，就把“参考结果/3-1”复制成“成果/3-1”。
-  （较大的成片视频没有放进练习包，可在课程网页上直接播放。）
-
-账号、作品、数据、评论均为虚构；样片为课程自制，人物均为 AI 原创角色。
-
-课程网站：https://juneyaooo.github.io/media-teach/
-'''
-    files = [(f, f'{PACK_DIR}/' + str(f.relative_to(SITE))) for f in sorted((SITE / '资料').rglob('*')) if f.is_file()]
-    if (SITE / '成果').exists():
-        files += [(f, f'{PACK_DIR}/参考结果/' + str(f.relative_to(SITE / '成果'))) for f in sorted((SITE / '成果').rglob('*'))
-                  if f.is_file() and f.stat().st_size < 5_000_000]
-    samples_ready = any((SITE / '资料/爆款样片').glob('*.mp4'))
-    files = [(f, n) for f, n in files
-             if f.name != '.DS_Store' and not (f.name == '样片待制作.txt' and samples_ready)]
-
-    def info(name):
-        zi = zipfile.ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))
-        zi.compress_type = zipfile.ZIP_DEFLATED
-        zi.external_attr = (0o40755 if name.endswith('/') else 0o100644) << 16
-        return zi
-    with zipfile.ZipFile(target, 'w') as z:
-        z.writestr(info(f'{PACK_DIR}/开始前请读.txt'), readme)
-        z.writestr(info(f'{PACK_DIR}/成果/'), '')
-        for f, name in files: z.writestr(info(name), f.read_bytes())
-    return target.stat().st_size
-
-
-pack_size = build_pack()
-pack_label = f'{pack_size / 1024 / 1024:.1f} MB' if pack_size > 1024 * 1024 else f'{pack_size // 1024} KB'
-
-
 # ---------- shared pieces ----------
 def shell(title, body, prefix='', bodyclass='', code=''):
     data = f' data-code="{code}"' if code else ''
@@ -164,10 +117,6 @@ def facts_line(l):
     if '难度' in m: bits.append(LEVEL.get(m['难度'], '难度 ' + m['难度']))
     if '前置' in m and m['前置'] not in ('无', '—'): bits.append('前置 ' + short_prereq(m['前置']))
     return ' · '.join(bits)
-
-
-def pack_button(prefix, cls='secondary'):
-    return f'<a class="{cls}" href="{prefix}{url(PACK_NAME)}" download>下载练习包 <span>{pack_label}</span></a>'
 
 
 # ---------- catalog ----------
@@ -192,28 +141,28 @@ def catalog(prefix=''):
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
         tracks += f'''<section class="course-group track" id="{key}"><div class="track-head"><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
-<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">跟着一个虚构的自媒体账号「阿夏的AI片场」，在 WorkBuddy 里用开源技能完成从找对标到安全发布的全过程。每一步都拿到能打开、能核对的文件。</p><p class="hero-what">WorkBuddy 是腾讯推出的桌面 AI 助手：你用中文说清要做什么，它会读取你电脑上指定文件夹里的资料，调用技能分析数据、拆视频、写脚本、出片，并把结果保存成文件。不需要会编程。</p>
-<div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a>{pack_button(p)}</div>
-<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课程 · 讲解录屏 · 可复制提示词 · 参考结果对照</p></div>
+<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>用 AI 做自媒体，<br>每一步都能核对。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每一课先讲清技能是怎么工作的，再带你拿到能打开、能核对的结果。</p><p class="hero-what">WorkBuddy 是腾讯推出的桌面 AI 助手：你用中文说清要做什么，它会读取你电脑上指定文件夹里的资料，调用技能分析数据、拆视频、写脚本、出片，并把结果保存成文件。不需要会编程。</p>
+<div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a><a class="secondary" href="#prepare">开始前准备</a></div>
+<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课程 · 原理流程图 · 讲解录屏 · 可复制提示词</p></div>
 <aside class="prepare" id="prepare"><h2>开始前准备</h2><ol>
 <li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。使用会消耗积分，具体规则以应用内说明为准。</p></div></li>
-<li><span>2</span><div><strong>下载练习包并解压</strong><p>得到“{PACK_DIR}”文件夹，里面有资料、空的成果文件夹和参考结果。</p></div></li>
-<li><span>3</span><div><strong>把文件夹设为工作空间</strong><p>在 WorkBuddy 点“新建任务”→“选择工作空间”→“打开本地文件夹”，选中它。</p></div></li>
-<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 会带你装好本课程的全部技能。之后每课：看录屏 → 复制提示词 → 打开结果核对。</p></div></li>
+<li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图、一两条你想学的对标爆款视频。还没起号的，想好一句话：做什么内容、给谁看。</p></div></li>
+<li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它作为工作空间，结果都会存在里面。</p></div></li>
+<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 会带你装好技能、配好 Key。之后每课：看原理图 → 看录屏 → 把提示词换成你自己的账号 → 核对结果。</p></div></li>
 </ol></aside></section>
 {start}
-<div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块按顺序衔接：前一课的结果是后一课的输入。也可以跳着学，缺的结果从“参考结果”复制。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
+<div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块按顺序衔接：前一课的结果是后一课的输入。也可以只学你需要的那一课，提示词里换成你手上已有的材料即可。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
 <p id="search-empty" hidden>没有匹配的课程，请试试“对标”“复刻”或课程编号。</p>
 <div class="tracks">{tracks}</div>
 <section class="faq" id="faq"><h2>卡住了怎么办</h2>
-<details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方是否显示“{PACK_DIR}”。没有的话，说明没选工作空间，新建任务重新选择。再打开电脑上的“成果”文件夹确认文件是否真的存在，不要只看回复里说“已保存”。</p></details>
-<details><summary>我的结果和录屏、参考结果不一样</summary><p>正常。AI 每次生成的内容都会不同。用每课的核对要点检查你的结果，再对照练习包里的“参考结果”。实操 2 起的提示词是针对作者那次结果写的纠正，你的结果没有同类问题就跳过。</p></details>
-<details><summary>没有显卡，也不想花钱租 GPU</summary><p>走代码视频路线：4-2、5-2 用 Hypit 和 HyperFrames 做代码类视频，不需要显卡。5-1 的 AI 镜头生成可以只看录屏，用参考结果里的成片继续往下学。</p></details>
-<details><summary>想用真实平台数据练习</summary><p>练习包里的数据已经够用。真要采集，可以用 MediaCrawler 这类工具，但要控制频率和数据量，采得太快太多容易被封号；只采公开数据，只做个人研究。</p></details>
+<details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方是否显示你的工作文件夹。没有的话，说明没选工作空间，新建任务重新选择。再打开电脑上的“成果”文件夹确认文件是否真的存在，不要只看回复里说“已保存”。</p></details>
+<details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的账号，而且 AI 每次生成的内容都会不同。用每课“怎么核对结果”里的要点检查，不用和录屏逐字对照。</p></details>
+<details><summary>没有显卡，也不想花钱租 GPU</summary><p>走代码视频路线：4-2、5-2 用 Hypit 和 HyperFrames 做代码类视频，不需要显卡。5-1 的 AI 镜头生成也可以直接调 API，按次付费。</p></details>
+<details><summary>技能读不到平台数据怎么办</summary><p>技能会先用 WorkBuddy 自带的浏览器能力看平台页面；读不出来时会问你：换 TikHub 接口（付费），或者你手动给链接和截图。批量采集工具如 MediaCrawler 容易被封号，课程不演示；确实要用，控制频率和数据量，只采公开数据做个人研究。</p></details>
 <details><summary>能不能拿别人的视频直接复刻发布？</summary><p>不能。拆解只用于学习做法；复刻要换成自己的故事、角色和文案，去掉原作者的水印和标识，并在发布前做 6-1 的审核。不要用真人明星的脸或声音。</p></details>
-<details><summary>想跳过某一课，或者前一课没做完</summary><p>把练习包“参考结果”里对应课号的文件夹复制到“成果”下，再学后面的课。</p></details>
+<details><summary>想跳过某一课，或者前一课没做完</summary><p>可以。后一课的提示词里，把“上一课的结果”换成你手上已有的材料：比如没做 1-1，就直接告诉它你的 3 个对标账号。</p></details>
 </section>
-<aside class="scope-note"><strong>关于练习素材</strong><p>账号、作品、数据和评论均为虚构；样片为课程自制，人物均为 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。学习进度只保存在你当前使用的浏览器里。</p></aside></main>
+<aside class="scope-note"><strong>关于录屏演示</strong><p>录屏里的“阿夏的AI片场”是演示账号，后台数据为虚构；两条爆款样片为课程自制，人物均为 AI 原创角色。平台规则会变，审核结论以平台最新公告为准。学习进度只保存在你当前使用的浏览器里。</p></aside></main>
 <footer class="site-footer"><span>{SITE_NAME} · 按步骤学习，依据结果核对。</span><a href="{GITHUB_URL}">查看 Markdown 与课程文件</a></footer>'''
     return shell('课程目录', body, prefix, 'home-page')
 
@@ -257,13 +206,12 @@ def overview(l):
     if l['code'] == '00':
         how = '读完路线说明后，回到目录从 01 入门开始。'
     elif l['code'] == '01':
-        how = '跟着步骤设好工作空间、装好技能，再生成第一个文件并核对。后面每一课都按这个循环来。'
+        how = '跟着步骤建好工作文件夹、装好技能、配好 Key，再跑一个小任务确认一切可用。'
     else:
-        how = ('先看讲解录屏了解全过程；再把“实操 1”的提示词复制到 WorkBuddy，完成后打开结果文件核对；最后读“完整方法”，换成自己的账号再做一次。'
-               '<br>注意：AI 每次的结果都不一样。实操 2 起是针对常见错误的纠正提示词，'
-               '先检查你的结果有没有同类问题，有就参照改写后再发，没有就跳过，不要原样照抄。')
+        how = ('先看“它是怎么工作的”弄懂原理，再看讲解录屏；然后把提示词里的 &lt;尖括号&gt; 换成你自己的账号或材料，提交给 WorkBuddy；'
+               '最后用“怎么核对结果”检查。AI 每次的结果都不一样，发现问题就直接告诉它哪里不对、为什么。')
     return (f'<section class="lesson-overview" aria-label="本课概览">' + (f'<dl>{rows}</dl>' if rows else '') +
-            f'<p class="how"><strong>怎么学</strong>{how}</p><div class="overview-actions">{pack_button("../")}'
+            f'<p class="how"><strong>怎么学</strong>{how}</p><div class="overview-actions">'
             f'<a class="secondary" href="#recording">看讲解录屏</a></div></section>')
 
 
@@ -303,85 +251,20 @@ def drop_missing_video_link(l, text):
     return re.sub(r'^\[观看 .*?实操录屏\]\(.*?\)( · \[字幕\]\(.*?\))?\s*$', '', text, flags=re.M)
 
 
-# ---------- material previews ----------
-# GitHub Pages serves .md/.csv/.srt as raw files (CSV and SRT usually download, Markdown shows
-# as plain text) and has no folder listings. Lesson links into 资料/ point at HTML previews
-# under 预览/ instead, so every material link opens in the browser.
-PREVIEW = SITE / '预览'
-PREVIEW_EXT = {'.md', '.csv', '.srt', '.txt', '.json'}
-
-
-def preview_body(f):
-    text = f.read_text(encoding='utf-8-sig')
-    if f.suffix == '.md': return md(text)
-    if f.suffix == '.csv':
-        import csv, io
-        rows = list(csv.reader(io.StringIO(text)))
-        if not rows: return '<p>（空文件）</p>'
-        head = ''.join(f'<th>{esc(c)}</th>' for c in rows[0])
-        body = ''.join('<tr>' + ''.join(f'<td>{esc(c)}</td>' for c in r) + '</tr>' for r in rows[1:])
-        return f'<p class="preview-count">共 {len(rows) - 1} 行</p><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
-    return f'<pre>{esc(text)}</pre>'
-
-
-def preview_page(rel, title, inner):
-    """rel: path of the page relative to SITE."""
-    prefix = '../' * (len(Path(rel).parts) - 1)
-    body = (f'<header class="site-header">{brand(prefix + "课程目录.html")}<nav aria-label="主导航">'
-            f'<a href="{prefix}课程目录.html">课程目录</a><a href="{prefix}{url(PACK_NAME)}" download>下载练习包</a></nav></header>'
-            f'<main id="main" class="lesson preview">{inner}'
-            f'<footer class="lesson-footer">这是练习包里的文件，仅供浏览。做练习时，请用解压后的练习包，在 WorkBuddy 里读取。</footer></main>')
-    out = SITE / rel
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(shell(title, body, prefix, 'preview-page'))
-
-
-def build_previews():
-    import shutil
-    shutil.rmtree(PREVIEW, ignore_errors=True)
-    src = SITE / '资料'
-    for f in sorted(src.rglob('*')):
-        if not f.is_file() or f.suffix not in PREVIEW_EXT: continue
-        rel = f.relative_to(SITE)
-        page = Path('预览') / (str(rel) + '.html')
-        back = '../' * (len(page.parts) - 1)
-        inner = (f'<p class="preview-path">{esc(rel)}</p><h1>{esc(f.name)}</h1>'
-                 f'<p><a class="secondary" href="{back}{url(rel)}" download>下载原文件</a></p>{preview_body(f)}')
-        preview_page(page, f.name, inner)
-    for d in sorted(p for p in src.rglob('*') if p.is_dir()):
-        rel = d.relative_to(SITE)
-        page = Path('预览') / rel / 'index.html'
-        items = ''
-        for f in sorted(d.iterdir()):
-            if f.name == '.DS_Store': continue
-            name = f.name + ('/' if f.is_dir() else '')
-            target = (f.name + '/index.html') if f.is_dir() else (f.name + '.html' if f.suffix in PREVIEW_EXT else '../' * (len(page.parts) - 1) + str(f.relative_to(SITE)))
-            items += f'<li><a href="{url(target)}">{esc(name)}</a></li>'
-        preview_page(page, d.name, f'<p class="preview-path">{esc(rel)}/</p><h1>{esc(d.name)}</h1><ul>{items}</ul>')
-
-
-build_previews()
+MERMAID = ('<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";'
+           'mermaid.initialize({startOnLoad:true,theme:"base",themeVariables:{primaryColor:"#eef0f8",primaryBorderColor:"#3a4a9c",lineColor:"#5a5e72",fontSize:"15px"}});</script>')
 
 
 def fix_material_links(rendered):
-    """Point lesson links at previews; turn links to files that do not exist yet into plain text."""
-    def sub(m):
-        href, label = m.group(1), m.group(2)
-        rel = unquote(href)[3:]  # strip leading ../
-        f = SITE / rel
-        if rel.endswith('/'):
-            return f'<a href="../{url("预览/" + rel + "index.html")}">{label}</a>' if f.is_dir() else label
-        if not f.exists():
-            return f'<span class="pending-file" title="制作中，暂时无法打开">{label}（制作中）</span>'
-        if f.suffix in PREVIEW_EXT:
-            return f'<a href="../{url("预览/" + rel + ".html")}">{label}</a>'
-        return m.group(0)
-    return re.sub(r'<a href="(\.\./(?:资料|%E8%B5%84%E6%96%99)/[^"]*)">(.*?)</a>', sub, rendered)
+    return rendered
 
 
 for l in lessons:
-    rendered = fix_material_links(md(drop_missing_video_link(l, l['text'])))
+    # The meta table is shown in the overview box; drop it from the body.
+    body_md = re.sub(r'^\| 项目 \| 内容 \|\n\| --- \| --- \|\n(?:\|.*\|\n)+\n?', '', l['text'], flags=re.M)
+    rendered = fix_material_links(md(drop_missing_video_link(l, body_md)))
     rendered = re.sub(r'<img ', '<img loading="lazy" decoding="async" ', rendered)
+    rendered = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<figure class="flow"><pre class="mermaid">\1</pre></figure>', rendered, flags=re.S)
     rendered = re.sub(r'<h4>(作者原文示例[^<]*)</h4>\s*(<pre>.*?</pre>)', r'<details class="author-example"><summary>\1</summary>\2</details>', rendered, flags=re.S)
     sections = []
 
@@ -398,10 +281,11 @@ for l in lessons:
     kicker = f'<div class="lesson-kicker"><span>{t["name"]} · 第 {pos} / {len(t["codes"])} 课</span><span class="done-flag" hidden>✓ 已学完</span></div>'
     done = '<div class="mark-done"><button type="button" id="mark-done" aria-pressed="false">标记本课已学完</button><span>进度只保存在当前浏览器里。</span></div>'
     body = (f'<header class="site-header">{brand("../课程目录.html")}<nav aria-label="主导航"><a href="../课程目录.html">课程目录</a>'
-            f'<a href="../{url(PACK_NAME)}" download>下载练习包</a><a href="{url(l["path"].name)}" download>下载本课 Markdown</a></nav></header>'
+            f'<a href="{url(l["path"].name)}" download>下载本课 Markdown</a></nav></header>'
             f'<div class="lesson-layout"><aside class="sidebar">{sidebar(l)}</aside><main id="main" class="lesson">{kicker}'
             f'<article>{intro}{overview(l)}{recording(l)}{toc}{rest}</article>{done}{pager(l["code"])}'
             f'<footer class="lesson-footer">练习素材均为虚构。复刻只学做法，发布前请做违规审核；平台规则以最新公告为准。</footer></main></div>')
+    if 'class="mermaid"' in body: body += MERMAID
     (SITE / '课程' / l['html']).write_text(shell(l['title'], body, '../', 'lesson-page', l['code']))
 
 (SITE / '课程目录.html').write_text(catalog())
@@ -412,4 +296,4 @@ for l in lessons:
 # A Markdown course list for people browsing the repository.
 rows = '\n'.join(f'| {l["code"]} | [{l["display"]}](课程/{url(l["html"])}) | {FOCUS[l["code"]]} |' for l in lessons)
 (SITE / '课程目录.md').write_text(f'# {SITE_NAME} · 课程目录\n\n| 课程 | 标题 | 内容 |\n| --- | --- | --- |\n{rows}\n')
-print(f'Built {len(lessons)} lessons, course directory and practice pack ({pack_label})')
+print(f'Built {len(lessons)} lessons and course directory')

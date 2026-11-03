@@ -216,3 +216,6 @@ body{font-size:16px}
 .pending-file{color:var(--muted,#667);border-bottom:1px dashed currentColor;cursor:help}
 @media (max-width:720px){.preview-page .lesson.preview{margin:12px 12px 32px}}
 .preview-page .lesson.preview td,.preview-page .lesson.preview th{white-space:nowrap}
+.lesson figure.flow{margin:20px 0 28px;padding:18px;border:1px solid var(--line);border-radius:8px;background:var(--paper);overflow-x:auto}
+.lesson figure.flow pre.mermaid{margin:0;padding:0;background:none;border:0;text-align:center;white-space:pre;color:var(--ink)}
+.lesson figure.flow .cluster rect{fill:transparent!important;stroke:none!important}
