@@ -19,8 +19,8 @@
 ## 一、总体顺序
 
 1. **做样片**：按 `样片制作.md` 做出两条样片，放进 `录屏方案/演示素材/爆款样片/`，删掉 `样片待制作.txt`。
-2. **确认外部条件**：WorkBuddy 有没有浏览器 / computer use 能力（决定 1-1、1-2、2-1 能否实搜平台）；多模态 Key（`VIDEO_ANALYSIS_API_KEY`）是否可用；没有浏览器能力时是否有 TikHub Key。结果写进 `录屏方案/_work/兼容性.md`，缺什么先停下来问人。
-3. **试跑兼容性**：在 WorkBuddy 里装好 01 课列出的全部技能，逐个确认能触发。装不上的写进 `录屏方案/_work/兼容性.md`，交给人决定该课改用什么演示。**不要自行换工具。**
+2. **确认外部条件**：WorkBuddy 有没有浏览器 / computer use 能力（决定 1-1、1-2、2-1 能否实搜平台）；看图模型 Key（`VIDEO_ANALYSIS_API_KEY`，硅基流动或 Gemini，见 01 讲义实操 1）是否可用；没有浏览器能力时是否有 TikHub Key。结果写进 `录屏方案/_work/兼容性.md`，缺什么先停下来问人。
+3. **试跑兼容性**：按各课讲义“你要准备什么”里的安装提示词，在 WorkBuddy 里把全课用到的技能都装一遍，逐个确认能触发。01 只装 social-account-doctor；benchmark-outlier-radar（1-2）、rea-video（3-1）、Hypit（4-2）、open-source-video-gen-skill 和 Capsule Cinema（5-1）、HyperFrames（5-2）、self-media-compliance-review（6-1）都在第一次用到的那课装。这几课的录屏开头有一段现场安装（S0），所以试跑装好后，各课 A 节会先在“已安装”里卸载本课技能再录，运行环境和本机配置保留。装不上的写进 `录屏方案/_work/兼容性.md`，交给人决定该课改用什么演示。**不要自行换工具。**
 4. **不录屏完整试跑一遍**：在另一个工作空间副本里，按 01 → 07 的顺序把每课的实操 1 跑一遍（不录屏）。每课在 `录屏方案/_work/试跑.md` 记一行：是否跑通、技能是否按讲义“它是怎么工作的”那几步执行、讲义“怎么核对结果”里哪几条没通过、出现了哪些明显问题。写完**停下来交给人审**。人据此定稿每课的核对旁白，然后才开录。
 5. **按顺序录课**：`01 → 1-1 → 1-2 → 2-1 → 2-2 → 3-1 → 3-2 → 4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2 → 07 → 00`。后面的课要用前面课的产物；00 是网站导览，最后录。
 6. **保存演示结果**：每课录完，把 `$WS/成果/<课号>/` 复制到 `录屏方案/_work/<课号>/成果/`，供后面的课和讲义截图使用。不放进学员可见的网站目录。
@@ -119,7 +119,7 @@ export WS=~/WorkBuddy录制/阿夏的AI片场
 
 命令见 `实践手册.md` 第 2 节。要点：
 
-- 每课文件“B. 录制步骤”里的 S1、S2…… 每一步录成一个原始片段 `录屏方案/_work/<课号>/raw/<课号>-S<n>.mp4`。
+- 每课文件“B. 录制步骤”里的 S0（安装技能，部分课有）、S1、S2…… 每一步录成一个原始片段 `录屏方案/_work/<课号>/raw/<课号>-S<n>.mp4`。
 - 不录系统声音。
 - 遇到 **标记**（如 `M1-2`）就记下秒数，写入 `_work/<课号>/marks.json`，误差 0.5 秒以内。
 - **输入一律粘贴**：`pbcopy` 写入剪贴板 → 点输入框 → `Cmd+V` → 停 3 秒 → 发送。
@@ -198,6 +198,9 @@ export WS=~/WorkBuddy录制/阿夏的AI片场
 | rea-video | rea video |
 | social-account-doctor | social account doctor |
 | benchmark-outlier-radar | benchmark outlier radar |
+| open-source-video-gen-skill | open source video gen skill |
+| ffmpeg | F F mpeg |
+| Node.js | Node J S |
 | self-media-compliance-review | 自媒体合规审核技能 |
 | Capsule Cinema | Capsule Cinema |
 | MediaCrawler | Media Crawler |

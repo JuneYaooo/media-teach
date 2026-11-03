@@ -15,31 +15,31 @@ GITHUB_URL = 'https://github.com/JuneYaooo/media-teach'
 SITE_NAME = '自媒体实战课堂'
 
 TRACKS = {
-    'start': dict(name='入门', codes=['00', '01'], desc='认识课程路线和 WorkBuddy，装好技能、配好 Key。'),
+    'start': dict(name='入门', codes=['00', '01'], desc='认识课程路线，装好 AI 助手，拿到第一个结果。'),
     'm1': dict(name='① 找对标', codes=['1-1', '1-2'], desc='谁才是真对标？对标这周出了什么爆款？'),
     'm2': dict(name='② 账号诊断', codes=['2-1', '2-2'], desc='我的号差在哪？这一条为什么不爆？'),
     'm3': dict(name='③ 视频拆解（逆向）', codes=['3-1', '3-2'], desc='爆款的画面、剪辑、声音、钩子和文案是怎么做的？'),
     'm4': dict(name='④ 爆款复刻', codes=['4-1', '4-2'], desc='保留爆款的套路，换成我的内容。'),
-    'm5': dict(name='⑤ 视频复刻', codes=['5-1', '5-2'], desc='按拆解结果，把画面真正做出来。'),
+    'm5': dict(name='⑤ 视频复刻（选学）', codes=['5-1', '5-2'], desc='做 AI 画面的号才需要。拍实拍、做口播的，写完脚本自己拍剪，直接接 ⑥。'),
     'm6': dict(name='⑥ 违规审核', codes=['6-1', '6-2'], desc='这条能不能发？账号为什么被限流？'),
     'end': dict(name='结课', codes=['07'], desc='一条视频从找对标走到可发布。'),
 }
 ORDER = [c for t in TRACKS.values() for c in t['codes']]
 FOCUS = {
-    '00': '课程路线、每课结构、要准备什么、两条视频生成路线。',
-    '01': '建好工作文件夹，装好技能、配好 Key，跑通第一个任务。',
-    '1-1': '用 social-account-doctor 按你的账号特征全网实搜对标。',
-    '1-2': '用 benchmark-outlier-radar 算倍数，找出对标这周真正爆的那条。',
-    '2-1': '用诊断模式给你的账号做漏斗、对标扫描和六维体检。',
-    '2-2': '上传一条作品的后台数据，找出它卡在漏斗哪一层。',
-    '3-1': '用 rea-video 逐镜拆出一条爆款的画面、花字、剪辑和声音。',
-    '3-2': '用拆爆款模式拆钩子、骨架和评论区，找出可复用的动作。',
-    '4-1': '用仿写模式套用爆款结构，写出你自己选题的标题、开头和脚本。',
-    '4-2': '用 Hypit 把爆款克隆成工作流，换成你的内容，批量出变体。',
-    '5-1': '按复刻方案，用开源 H3 生成 AI 镜头：租 GPU 或调 API。',
-    '5-2': '用 HyperFrames 做可复用的花字模板，存成下集能用的配方。',
-    '6-1': '发布前用合规技能审你的成片：逐条定位、定级、改完复审。',
-    '6-2': '被限流后排查原因，先整改再申诉，准备申诉材料。',
+    '00': '这门课帮你省掉哪些活儿、怎么学、名词小抄、大概花多少钱。',
+    '01': '不开终端、不写代码：申请看图 Key，装好第一个技能，写出你的账号定位。',
+    '1-1': '不知道该学谁？给出主页，让 AI 按你的特征去平台上搜出对标。',
+    '1-2': '不比点赞绝对数，看每条是它平时的几倍，找出对标这周爆了的那条。',
+    '2-1': '流量卡在哪、和对标差在哪，拿到按优先级排好的改进清单。',
+    '2-2': '截一张后台数据，看这条卡在曝光、点击、完播还是互动。',
+    '3-1': '一镜一镜看清爆款的景别、节奏、花字和配乐，拿到照着做的方案。',
+    '3-2': '开头靠什么留人、正文什么骨架、评论区在要什么，找出能抄的那一招。',
+    '4-1': '套用爆款结构写你的选题：3 个标题、3 个封面字、开头和脚本。',
+    '4-2': '字幕卡片、榜单类视频：把爆款做成模板，换内容批量出变体。',
+    '5-1': '选学：按分镜用 AI 生成镜头，先出一条校准再批量。',
+    '5-2': '选学：做花字和标题卡，把整套做法存成下集能复用的配方。',
+    '6-1': '发之前审一遍：哪一秒、哪一句有风险，怎么改，改完复审。',
+    '6-2': '被限流了：按证据排查原因，先整改再申诉，备好申诉材料。',
     '07': '用你自己的账号跑通全流程，变成每周循环。',
 }
 EXTRA_META = {'00': {'产出': '选定学习顺序，准备好自己的账号资料'}}
@@ -48,6 +48,19 @@ META_KEYS = ['难度', '时长', '前置', '产出', '用到的工具']
 CODE_RE = r'(?<![0-9-])(?:[1-6]-[12]|0[017])(?![0-9-])'
 
 md = mistune.create_markdown(plugins=['table', 'strikethrough', 'task_lists', 'url'])
+
+
+FOLD_RE = re.compile(r'^::: ?(.+?)\n(.*?)\n:::[ \t]*$', re.M | re.S)
+
+
+def render_md(text):
+    """Render Markdown; `::: 标题` … `:::` blocks become collapsed <details>."""
+    out, last = '', 0
+    for m in FOLD_RE.finditer(text):
+        out += md(text[last:m.start()])
+        out += f'<details class="fold"><summary>{esc(m.group(1).strip())}</summary>{md(m.group(2))}</details>'
+        last = m.end()
+    return out + md(text[last:])
 
 
 def esc(s): return html.escape(str(s), quote=True)
@@ -133,7 +146,7 @@ def catalog(prefix=''):
     p = prefix
     first = by_code.get('01') or lessons[0]
     start_cards = ''.join(course_card(by_code[c], p) for c in ['01', '00'] if c in by_code)
-    start = f'''<section class="course-group start-group" id="start"><div class="section-heading"><div><span class="eyebrow">第一步</span><h2>先学入门课</h2></div><p>选好工作文件夹，装好技能，学会打开文件看结果。</p></div>
+    start = f'''<section class="course-group start-group" id="start"><div class="section-heading"><div><span class="eyebrow">第一步</span><h2>先学入门课</h2></div><p>30 分钟装好 AI 助手，拿到你账号的第一个结果。不用开终端，不用写代码。</p></div>
 <ol class="start-cards">{start_cards}</ol></section>'''
     tracks = ''
     for key, t in TRACKS.items():
@@ -148,7 +161,7 @@ def catalog(prefix=''):
 <li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。用起来会扣积分，规则看应用内说明。</p></div></li>
 <li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图，再挑一两条想学的对标爆款视频。还没起号的，想好一句话：做什么内容，给谁看。</p></div></li>
 <li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它当工作空间，之后的结果都存在这里。</p></div></li>
-<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你装技能、配 Key。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号，再核对结果。</p></div></li>
+<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你申请看图 Key、装第一个技能。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号，再核对结果。拍实拍、做口播的，模块⑤可以跳过。</p></div></li>
 </ol></aside></section>
 {start}
 <div class="catalog-tools"><div><span class="eyebrow">第二步</span><h2>按模块学下去</h2><p>六个模块是连着的，前一课的结果就是后一课的材料。只想学某一课也行，把提示词里的材料换成你手上有的。</p></div><label class="search-label">查找课程<input id="course-search" type="search" placeholder="课程名、编号或关键词" autocomplete="off"></label></div>
@@ -157,7 +170,8 @@ def catalog(prefix=''):
 <section class="faq" id="faq"><h2>卡住了怎么办</h2>
 <details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方有没有显示你的工作文件夹。没有就是没选工作空间，新建任务重选。然后去电脑上打开“成果”文件夹，看文件在不在。回复里说“已保存”不算数。</p></details>
 <details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的号，AI 每次生成的内容也不一样。按每课“怎么核对结果”里的几条查就行，不用和录屏逐字比。</p></details>
-<details><summary>没有显卡，也不想花钱租 GPU</summary><p>走代码视频：4-2、5-2 用 Hypit 和 HyperFrames 写代码出片，不用显卡。5-1 的 AI 镜头也能直接调 API，按次付费。</p></details>
+<details><summary>没有显卡，也不想花钱租 GPU</summary><p>拍实拍、做口播的用不到显卡，模块⑤直接跳过。想做 AI 画面的，可以走代码视频：4-2、5-2 用 Hypit 和 HyperFrames 写代码出片，不用显卡。5-1 的 AI 镜头也能直接调 API，按次付费。</p></details>
+<details><summary>学完要花多少钱</summary><p>WorkBuddy 按积分扣，看图模型 Key 按用量付费，打不开平台页面时才需要付费的 TikHub。雷达、拆解、审核这些技能在你电脑上跑，不额外收费。00 总纲里有一张费用表，建议先充一点小钱试跑 1-1、2-1。</p></details>
 <details><summary>技能读不到平台数据怎么办</summary><p>技能先用 WorkBuddy 自带的浏览器去看平台页面。读不出来，它会问你是换 TikHub 接口（付费），还是你自己给链接和截图。MediaCrawler 这类批量采集工具容易被封号，课程不演示；非要用的话，控制频率和数据量，只采公开数据，自己研究用。</p></details>
 <details><summary>能不能拿别人的视频直接复刻发布？</summary><p>不能。拆解是为了学做法。复刻要换成自己的故事、角色和文案，去掉原作者的水印和标识，发布前过一遍 6-1 的审核。别用真人明星的脸和声音。</p></details>
 <details><summary>想跳过某一课，或者前一课没做完</summary><p>可以。把后一课提示词里的“上一课的结果”换成你手上有的材料。比如没做 1-1，就直接告诉它你的 3 个对标账号。</p></details>
@@ -262,7 +276,7 @@ def fix_material_links(rendered):
 for l in lessons:
     # The meta table is shown in the overview box; drop it from the body.
     body_md = re.sub(r'^\| 项目 \| 内容 \|\n\| --- \| --- \|\n(?:\|.*\|\n)+\n?', '', l['text'], flags=re.M)
-    rendered = fix_material_links(md(drop_missing_video_link(l, body_md)))
+    rendered = fix_material_links(render_md(drop_missing_video_link(l, body_md)))
     rendered = re.sub(r'<img ', '<img loading="lazy" decoding="async" ', rendered)
     rendered = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>', r'<figure class="flow"><pre class="mermaid">\1</pre></figure>', rendered, flags=re.S)
     rendered = re.sub(r'<h4>(作者原文示例[^<]*)</h4>\s*(<pre>.*?</pre>)', r'<details class="author-example"><summary>\1</summary>\2</details>', rendered, flags=re.S)

@@ -219,3 +219,7 @@ body{font-size:16px}
 .lesson figure.flow{margin:20px 0 28px;padding:18px;border:1px solid var(--line);border-radius:8px;background:var(--paper);overflow-x:auto}
 .lesson figure.flow pre.mermaid{margin:0;padding:0;background:none;border:0;text-align:center;white-space:pre;color:var(--ink)}
 .lesson figure.flow .cluster rect{fill:transparent!important;stroke:none!important}
+
+.lesson details.fold{margin:16px 0;padding:0 16px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.lesson details.fold>summary{cursor:pointer;padding:12px 0;font-weight:600;color:var(--muted,#5a5e72)}
+.lesson details.fold[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
