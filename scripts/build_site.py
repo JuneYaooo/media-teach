@@ -5,7 +5,7 @@ Recordings are optional: a lesson without `录屏/<code>-WorkBuddy实操.json` s
 """
 from pathlib import Path
 import html, json, re, zipfile
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 import mistune
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -303,8 +303,84 @@ def drop_missing_video_link(l, text):
     return re.sub(r'^\[观看 .*?实操录屏\]\(.*?\)( · \[字幕\]\(.*?\))?\s*$', '', text, flags=re.M)
 
 
+# ---------- material previews ----------
+# GitHub Pages serves .md/.csv/.srt as raw files (CSV and SRT usually download, Markdown shows
+# as plain text) and has no folder listings. Lesson links into 资料/ point at HTML previews
+# under 预览/ instead, so every material link opens in the browser.
+PREVIEW = SITE / '预览'
+PREVIEW_EXT = {'.md', '.csv', '.srt', '.txt', '.json'}
+
+
+def preview_body(f):
+    text = f.read_text(encoding='utf-8-sig')
+    if f.suffix == '.md': return md(text)
+    if f.suffix == '.csv':
+        import csv, io
+        rows = list(csv.reader(io.StringIO(text)))
+        if not rows: return '<p>（空文件）</p>'
+        head = ''.join(f'<th>{esc(c)}</th>' for c in rows[0])
+        body = ''.join('<tr>' + ''.join(f'<td>{esc(c)}</td>' for c in r) + '</tr>' for r in rows[1:])
+        return f'<p class="preview-count">共 {len(rows) - 1} 行</p><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>'
+    return f'<pre>{esc(text)}</pre>'
+
+
+def preview_page(rel, title, inner):
+    """rel: path of the page relative to SITE."""
+    prefix = '../' * (len(Path(rel).parts) - 1)
+    body = (f'<header class="site-header">{brand(prefix + "课程目录.html")}<nav aria-label="主导航">'
+            f'<a href="{prefix}课程目录.html">课程目录</a><a href="{prefix}{url(PACK_NAME)}" download>下载练习包</a></nav></header>'
+            f'<main id="main" class="lesson preview">{inner}'
+            f'<footer class="lesson-footer">这是练习包里的文件，仅供浏览。做练习时，请用解压后的练习包，在 WorkBuddy 里读取。</footer></main>')
+    out = SITE / rel
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(shell(title, body, prefix, 'preview-page'))
+
+
+def build_previews():
+    import shutil
+    shutil.rmtree(PREVIEW, ignore_errors=True)
+    src = SITE / '资料'
+    for f in sorted(src.rglob('*')):
+        if not f.is_file() or f.suffix not in PREVIEW_EXT: continue
+        rel = f.relative_to(SITE)
+        page = Path('预览') / (str(rel) + '.html')
+        back = '../' * (len(page.parts) - 1)
+        inner = (f'<p class="preview-path">{esc(rel)}</p><h1>{esc(f.name)}</h1>'
+                 f'<p><a class="secondary" href="{back}{url(rel)}" download>下载原文件</a></p>{preview_body(f)}')
+        preview_page(page, f.name, inner)
+    for d in sorted(p for p in src.rglob('*') if p.is_dir()):
+        rel = d.relative_to(SITE)
+        page = Path('预览') / rel / 'index.html'
+        items = ''
+        for f in sorted(d.iterdir()):
+            if f.name == '.DS_Store': continue
+            name = f.name + ('/' if f.is_dir() else '')
+            target = (f.name + '/index.html') if f.is_dir() else (f.name + '.html' if f.suffix in PREVIEW_EXT else '../' * (len(page.parts) - 1) + str(f.relative_to(SITE)))
+            items += f'<li><a href="{url(target)}">{esc(name)}</a></li>'
+        preview_page(page, d.name, f'<p class="preview-path">{esc(rel)}/</p><h1>{esc(d.name)}</h1><ul>{items}</ul>')
+
+
+build_previews()
+
+
+def fix_material_links(rendered):
+    """Point lesson links at previews; turn links to files that do not exist yet into plain text."""
+    def sub(m):
+        href, label = m.group(1), m.group(2)
+        rel = unquote(href)[3:]  # strip leading ../
+        f = SITE / rel
+        if rel.endswith('/'):
+            return f'<a href="../{url("预览/" + rel + "index.html")}">{label}</a>' if f.is_dir() else label
+        if not f.exists():
+            return f'<span class="pending-file" title="制作中，暂时无法打开">{label}（制作中）</span>'
+        if f.suffix in PREVIEW_EXT:
+            return f'<a href="../{url("预览/" + rel + ".html")}">{label}</a>'
+        return m.group(0)
+    return re.sub(r'<a href="(\.\./(?:资料|%E8%B5%84%E6%96%99)/[^"]*)">(.*?)</a>', sub, rendered)
+
+
 for l in lessons:
-    rendered = md(drop_missing_video_link(l, l['text']))
+    rendered = fix_material_links(md(drop_missing_video_link(l, l['text'])))
     rendered = re.sub(r'<img ', '<img loading="lazy" decoding="async" ', rendered)
     rendered = re.sub(r'<h4>(作者原文示例[^<]*)</h4>\s*(<pre>.*?</pre>)', r'<details class="author-example"><summary>\1</summary>\2</details>', rendered, flags=re.S)
     sections = []

@@ -209,3 +209,10 @@ body{font-size:16px}
 .author-example{border:1px dashed var(--line);border-radius:6px;padding:8px 14px;margin:10px 0 18px;background:var(--tint)}
 .author-example summary{cursor:pointer;color:var(--muted);font-size:15px}
 .checklist-note{color:var(--muted)}
+.preview-page .lesson.preview{max-width:1180px;margin:24px auto 48px}
+.preview-path{margin:0 0 4px;color:var(--muted,#667);font-size:14px;word-break:break-all}
+.preview-count{color:var(--muted,#667);font-size:14px}
+.preview-page .lesson.preview ul{line-height:2}
+.pending-file{color:var(--muted,#667);border-bottom:1px dashed currentColor;cursor:help}
+@media (max-width:720px){.preview-page .lesson.preview{margin:12px 12px 32px}}
+.preview-page .lesson.preview td,.preview-page .lesson.preview th{white-space:nowrap}
