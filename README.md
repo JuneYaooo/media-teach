@@ -4,10 +4,10 @@
 
 **[进入课程网站](https://juneyaooo.github.io/media-teach/)**
 
-- 每课先用一张流程图讲技能怎么干活，再给提示词（只写需求），最后教你核对结果
+- 每课先用一张流程图讲技能怎么干活，再给提示词（只写需求），最后看你会拿到什么
 - 录屏用演示账号「阿夏的AI片场」完整演示（后台数据虚构，样片自制；找对标是平台实搜）
 - 共 15 节：00 总纲、01 入门、六个模块各 2 节、07 结课
-- 工具：[JuneYaooo](https://github.com/JuneYaooo) 的开源自媒体项目，以及 Hypit、HyperFrames 等开源项目
+- 工具：[JuneYaooo](https://github.com/JuneYaooo) 的开源自媒体项目，包括用 [cheap-claude-video](https://github.com/JuneYaooo/cheap-claude-video) 做爆款复刻，以及 Hypit、HyperFrames 等开源项目
 - AI 视频生成两条路线：开源 MiniMax H3（自己在 AutoDL 租 GPU，或直接调 MiniMax / RunningHub 的 API），或 HyperFrames 代码视频
 - 演示与录屏：WorkBuddy
 

@@ -19,13 +19,13 @@ TRACKS = {
     'm1': dict(name='① 找对标', codes=['1-1', '1-2'], desc='谁才是真对标？对标这周出了什么爆款？'),
     'm2': dict(name='② 账号诊断', codes=['2-1', '2-2'], desc='我的号差在哪？这一条为什么不爆？'),
     'm3': dict(name='③ 视频拆解（逆向）', codes=['3-1', '3-2'], desc='爆款的画面、剪辑、声音、钩子和文案是怎么做的？'),
-    'm4': dict(name='④ 爆款复刻', codes=['4-1', '4-2'], desc='保留爆款的套路，换成我的内容。'),
+    'm4': dict(name='④ 爆款复刻', codes=['4-1', '4-2'], desc='把爆款拆成配方，换成我的内容，一期一期做下去。'),
     'm5': dict(name='⑤ 视频复刻（选学）', codes=['5-1', '5-2'], desc='做 AI 画面的号才需要。拍实拍、做口播的，写完脚本自己拍剪，直接接 ⑥。'),
     'm6': dict(name='⑥ 违规审核', codes=['6-1', '6-2'], desc='这条能不能发？账号为什么被限流？'),
     'end': dict(name='结课', codes=['07'], desc='一条视频从找对标走到可发布。'),
 }
 MOD = {'start': ('#5a6178', 'rocket'), 'm1': ('#3a4a9c', 'crosshair'), 'm2': ('#0f766e', 'stethoscope'),
-       'm3': ('#7c4dbd', 'scissors'), 'm4': ('#c2410c', 'pen-line'), 'm5': ('#be185d', 'clapperboard'),
+       'm3': ('#7c4dbd', 'scissors'), 'm4': ('#c2410c', 'copy'), 'm5': ('#be185d', 'clapperboard'),
        'm6': ('#b42318', 'shield-check'), 'end': ('#2f7a4f', 'refresh-cw')}
 ORDER = [c for t in TRACKS.values() for c in t['codes']]
 FOCUS = {
@@ -37,8 +37,8 @@ FOCUS = {
     '2-2': '截一张后台数据，看这条卡在曝光、点击、完播还是互动。',
     '3-1': '一镜一镜看清爆款的景别、节奏、花字和配乐，拿到照着做的方案。',
     '3-2': '开头靠什么留人、正文什么骨架、评论区在要什么，找出能抄的那一招。',
-    '4-1': '套用爆款结构写你的选题：3 个标题、3 个封面字、开头和脚本。',
-    '4-2': '字幕卡片、榜单类视频：把爆款做成模板，换内容批量出变体。',
+    '4-1': '把一条爆款拆成配方，换成你的主题：先审分镜，试一镜，再出整条。',
+    '4-2': '一个配方连做多期：一次列几个选题，逐期出分镜、出片、质检。',
     '5-1': '选学：按分镜用 AI 生成镜头，先出一条校准再批量。',
     '5-2': '选学：做花字和标题卡，把整套做法存成下集能复用的配方。',
     '6-1': '发之前审一遍：哪一秒、哪一句有风险，怎么改，改完复审。',
@@ -168,14 +168,14 @@ def catalog(prefix=''):
         cards = ''.join(course_card(by_code[c], p) for c in t['codes'])
         tracks += f'''<section class="course-group track" id="{key}" style="--mod:{MOD[key][0]}"><div class="track-head"><span class="mod-badge">{icon(MOD[key][1])}</span><div><h3>{t["name"]}</h3><p>{t["desc"]}</p></div><span class="track-progress" data-track="{key}" data-total="{len(t["codes"])}">{len(t["codes"])} 课</span></div><ol class="course-list">{cards}</ol></section>'''
     body = f'''<header class="site-header">{brand(p + '课程目录.html')}<nav aria-label="主导航"><a href="#prepare">开始前准备</a><a href="#m1">课程</a><a href="#faq">常见问题</a><a href="{GITHUB_URL}">GitHub</a></nav></header>
-<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>找对标、拆爆款、写脚本，<br>交给 AI 去做。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你做出结果，自己打开核对。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
+<main id="main" class="home"><section class="hero"><div><p class="eyebrow">找对标 · 账号诊断 · 视频拆解 · 爆款复刻 · 视频复刻 · 违规审核</p><h1>找对标、拆爆款、写脚本，<br>交给 AI 去做。</h1><p class="hero-lead">用你自己的账号，在 WorkBuddy 里学会用开源技能找对标、做诊断、拆爆款、写脚本、出片和发布前审核。每课先讲技能怎么干活，再带你用自己的账号做出结果。</p><p class="hero-what">WorkBuddy 是腾讯的桌面 AI 助手。你用中文说要做什么，它去读你指定文件夹里的资料，调技能分析数据、拆视频、写脚本、出片，结果存成文件。不用会编程。</p>
 <div class="hero-actions"><a class="primary" href="{p}课程/{url(first["html"])}">开始入门课 <span aria-hidden="true">→</span></a><a class="secondary" href="#prepare">开始前准备</a></div>
-<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课 · 每课一张原理图 · 提示词一键复制 · 每一步都能核对</p></div>
+<p id="resume" class="resume" hidden></p><p class="hero-meta">{len(lessons)} 节课 · 每课一张原理图 · 一张结果示意图 · 提示词一键复制</p></div>
 <aside class="prepare" id="prepare"><h2>开始前准备</h2><ol>
 <li><span>1</span><div><strong>安装并登录 WorkBuddy</strong><p>从<a href="{WORKBUDDY_URL}">官网</a>下载 Windows 或 Mac 版并登录。用起来会扣积分，规则看应用内说明。</p></div></li>
 <li><span>2</span><div><strong>准备你自己的账号资料</strong><p>主页链接、后台数据截图，再挑一两条想学的对标爆款视频。还没起号的，想好一句话：做什么内容，给谁看。</p></div></li>
 <li><span>3</span><div><strong>建一个工作文件夹</strong><p>在电脑上新建一个文件夹（比如“我的自媒体工作台”），在 WorkBuddy 里选它当工作空间，之后的结果都存在这里。</p></div></li>
-<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你申请看图 Key、装第一个技能。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号，再核对结果。拍实拍、做口播的，模块⑤可以跳过。</p></div></li>
+<li><span>4</span><div><strong>从 01 入门开始</strong><p>01 带你申请看图 Key、装第一个技能。之后每课的节奏是：看原理图，看录屏，把提示词换成你自己的账号发给 WorkBuddy。拍实拍、做口播的，模块⑤可以跳过。</p></div></li>
 </ol></aside></section>
 {course_map()}
 {start}
@@ -184,8 +184,8 @@ def catalog(prefix=''):
 <div class="tracks">{tracks}</div>
 <section class="faq" id="faq"><h2>卡住了怎么办</h2>
 <details><summary>提交任务后，没看到生成的文件</summary><p>先看输入框下方有没有显示你的工作文件夹。没有就是没选工作空间，新建任务重选。然后去电脑上打开“成果”文件夹，看文件在不在。回复里说“已保存”不算数。</p></details>
-<details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的号，AI 每次生成的内容也不一样。按每课“怎么核对结果”里的几条查就行，不用和录屏逐字比。</p></details>
-<details><summary>没有显卡，也不想花钱租 GPU</summary><p>拍实拍、做口播的用不到显卡，模块⑤直接跳过。想做 AI 画面的，可以走代码视频：4-2、5-2 用 Hypit 和 HyperFrames 写代码出片，不用显卡。5-1 的 AI 镜头也能直接调 API，按次付费。</p></details>
+<details><summary>我的结果和录屏不一样</summary><p>正常。录屏用的是演示账号“阿夏的AI片场”，你用的是自己的号，AI 每次生成的内容也不一样。看结构对不对就行，不用和录屏逐字比。</p></details>
+<details><summary>没有显卡，也不想花钱租 GPU</summary><p>拍实拍、做口播的用不到显卡，模块⑤直接跳过。想做 AI 画面的，可以走代码视频：4-1 的 Hypit、5-2 的 HyperFrames 写代码出片，不用显卡。5-1 的 AI 镜头也能直接调 API，按次付费。</p></details>
 <details><summary>学完要花多少钱</summary><p>WorkBuddy 按积分扣，看图模型 Key 按用量付费，打不开平台页面时才需要付费的 TikHub。雷达、拆解、审核这些技能在你电脑上跑，不额外收费。00 总纲里有一张费用表，建议先充一点小钱试跑 1-1、2-1。</p></details>
 <details><summary>技能读不到平台数据怎么办</summary><p>技能先用 WorkBuddy 自带的浏览器去看平台页面。读不出来，它会问你是换 TikHub 接口（付费），还是你自己给链接和截图。MediaCrawler 这类批量采集工具容易被封号，课程不演示；非要用的话，控制频率和数据量，只采公开数据，自己研究用。</p></details>
 <details><summary>能不能拿别人的视频直接复刻发布？</summary><p>不能。拆解是为了学做法。复刻要换成自己的故事、角色和文案，去掉原作者的水印和标识，发布前过一遍 6-1 的审核。别用真人明星的脸和声音。</p></details>
@@ -230,7 +230,7 @@ KINDS = [('它是怎么工作的', 'how', '原理'), ('你要准备什么', 'pre
          ('进阶与边界', 'more', '进阶'), ('下一课', 'next', '下一步'), ('本次任务结果与核对', 'demo', '演示'),
          ('操作画面', 'shots', '截图')]
 KIND_LABEL = {k: lab for _, k, lab in KINDS}
-PATH_STEPS = [('how', '看懂原理'), ('prep', '准备材料'), ('do', '动手做'), ('check', '核对结果')]
+PATH_STEPS = [('how', '看懂原理'), ('prep', '准备材料'), ('do', '动手做'), ('get', '拿到结果')]
 
 
 def kind_of(title):

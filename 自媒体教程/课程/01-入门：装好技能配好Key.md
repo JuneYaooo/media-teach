@@ -74,7 +74,7 @@ Key 就是一串密码，让技能能用你的账户去调用模型、按用量�
 
 ### 实操 2：安装 social-account-doctor 并填 Key
 
-这是 1-1、2-1、2-2、3-2、4-1 都要用的技能，先装它。
+这是 1-1、2-1、2-2、3-2 都要用的技能，先装它。
 
 ```text
 请帮我安装 social-account-doctor 技能，安装说明在：
@@ -113,7 +113,7 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 用 social-account-doctor 看一下我的账号：<你的主页链接>。用一句话帮我写出账号定位：做什么内容、什么形式、给谁看、和同类比有什么不一样。数字和判断都要能在主页上找到，看不到的标出来。结果放到 成果/01。
 ```
 
-这句定位在 4-1 写自己的版本时要用，先存好。
+这句定位在 4-1 复刻爆款、换成你的内容时要用，先存好。
 
 ### 其他技能：学到那一课再装
 
@@ -123,8 +123,9 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 | --- | --- | --- |
 | benchmark-outlier-radar | 1-2 | 算出对标每条作品是它平时的几倍，找出真爆款 |
 | rea-video | 3-1 | 逐镜拆一条视频：每一镜怎么拍、怎么做的 |
-| Hypit | 4-2 | 把一条爆款做成模板，换内容批量出变体 |
-| open-source-video-gen-skill、Capsule Cinema | 5-1（选学） | 用 AI 生成镜头 |
+| Capsule Cinema | 4-1 | 把爆款拆成配方，换成你的内容出片，还能批量做多期 |
+| Hypit（可选） | 4-1 | 字幕卡片、榜单类视频的另一种复刻做法 |
+| open-source-video-gen-skill | 5-1（选学） | 用开源 H3 生成 AI 镜头 |
 | HyperFrames | 5-2（选学） | 做花字、标题卡 |
 | self-media-compliance-review | 6-1 | 发布前审核、限流排查 |
 
@@ -135,7 +136,7 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 | [rea-video](https://github.com/JuneYaooo/rea-video) | Python 3.10+、ffmpeg | 可选：能看视频的模型 Key，不配也能用 |
 | [Hypit](https://github.com/hypit-ai/hypit) | Node.js 22+ | 代码视频路线不需要 |
 | [open-source-video-gen-skill](https://github.com/mini-yifan/open-source-video-gen-skill) | Python | AutoDL 账号和 Token（自己租 GPU 时） |
-| [Capsule Cinema](https://github.com/JuneYaooo/cheap-claude-video) | Python 3.12 | 直接调 H3 API 时：MiniMax 或 RunningHub 的 Key |
+| [Capsule Cinema](https://github.com/JuneYaooo/cheap-claude-video) | Python 3.12、ffmpeg | 生成画面和配音时：你选的渠道的 Key（如 Seedance、MiniMax、RunningHub、豆包语音）；只看配方、出分镜不需要 |
 | [HyperFrames](https://github.com/heygen-com/hyperframes) | Node.js 22+、ffmpeg | 不需要 |
 | [self-media-compliance-review](https://github.com/JuneYaooo/self-media-compliance-review) | Python | 不需要，默认不联网 |
 
@@ -154,14 +155,6 @@ https://raw.githubusercontent.com/JuneYaooo/social-account-doctor/main/docs/inst
 | 账号定位一句话 | 工作文件夹的 `成果/01` 里 |
 
 录屏里演示账号“阿夏的AI片场”的结果见下方截图。
-
-## 怎么核对结果
-
-- [ ] **技能装上了**：在“已安装”列表里能看到，开关是开的。别只听 AI 说“装好了”。
-- [ ] **Key 没进对话**：翻一遍对话记录，没有出现 Key 的明文。
-- [ ] **网页结论是看到的**：它说能看到哪些数字，你自己打开同一个页面对一下。
-- [ ] **定位有依据**：定位里的每个判断，能在你的主页上找到对应的作品或简介；它标了“看不到”的地方，自己补上。
-- [ ] **文件确实存在**：打开电脑上的工作文件夹，`成果/01` 里有这个文件。
 
 ## 常见问题
 
